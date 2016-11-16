@@ -1,0 +1,11 @@
+<tool id='convert.gate2json_2.0.0' name='GateToLif v2.0.0' version='2.0.0'>
+  <description>Converts GATE/XML documents to the LAPPS JSON/LD format.</description>
+  <command interpreter="lsd">./invoke.lsd convert.gate2json_2.0.0 $input true $output</command>
+  <inputs>
+    <param name='input' type='data' format='gate' label='Gate Input' />
+  </inputs>
+  <outputs>
+    <data name='output' format='lif' />
+  </outputs>
+  <help>Converts GATE documents to the LAPPS JSON/LD format.</help>
+</tool>
