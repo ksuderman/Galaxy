@@ -126,7 +126,7 @@ class Lapps( LappsJson ):
         #return True
 
 
-class Text( Lapps ):
+class LifText( Lapps ):
     file_ext = "liftxt"
     header = '''{"discriminator":"http://vocab.lappsgrid.org/ns/media/text"'''
     blurb = "Data object with plain text as the payload."

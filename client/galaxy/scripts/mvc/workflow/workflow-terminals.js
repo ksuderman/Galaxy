@@ -302,8 +302,10 @@ define(['mvc/workflow/workflow-globals'], function( Globals ) {
         },
         _producesAcceptableDatatype: function( other ) {
             // other is a non-collection output...
+            //console.log("Checking for and acceptable datatype from " + other)
             for ( var t in this.datatypes ) {
                 var thisDatatype = this.datatypes[t];
+                //console.log("thisDatatype = " + thisDatatype);
                 if( thisDatatype == "input" ) {
                     return true;
                 }
@@ -312,6 +314,7 @@ define(['mvc/workflow/workflow-globals'], function( Globals ) {
                 if (other.node.post_job_actions){
                     for (var pja_i in other.node.post_job_actions){
                         var pja = other.node.post_job_actions[pja_i];
+                        //console.log("Post Job Action: " + pja.action_type + " " + pja.output_name)
                         if (pja.action_type == "ChangeDatatypeAction" && (pja.output_name == '' || pja.output_name == other.name) && pja.action_arguments){
                             cat_outputs.push(pja.action_arguments['newtype']);
                         }
@@ -320,11 +323,17 @@ define(['mvc/workflow/workflow-globals'], function( Globals ) {
                 // FIXME: No idea what to do about case when datatype is 'input'
                 for ( var other_datatype_i in cat_outputs ) {
                     var other_datatype = cat_outputs[other_datatype_i];
+                    //console.log("Checking " + other_datatype)
                     if ( other_datatype == "input" || other_datatype == "_sniff_" || other_datatype == "input_collection" || Globals.app.isSubType( cat_outputs[other_datatype_i], thisDatatype ) ) {
+                        //console.log(other_datatype + " is an acceptable data type.");
                         return true;
+                    }
+                    if ( thisDatatype === 'gate' || thisDatatype === 'lif' ) {
+                        return other_datatype === 'lif' || other_datatype === 'gate'
                     }
                 }
             }
+            console.log("No acceptable datatype found.")
             return false;
         },
         _otherCollectionType: function( other ) {
