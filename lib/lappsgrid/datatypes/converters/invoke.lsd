@@ -8,7 +8,6 @@ String password = "tester"
 String url = "http://vassar.lappsgrid.org/invoker/anc:${service}"
 ServiceClient client = new ServiceClient(url, username, password)
 String json = new File(input).text
-println "Gate converter calling $url"
 json = client.execute(json)
 println json
 new File(output).text = json
