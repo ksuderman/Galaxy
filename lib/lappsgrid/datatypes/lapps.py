@@ -91,11 +91,13 @@ class Lapps( LappsJson ):
     header = '''{"discriminator":'''
     blurb = "Lapps Data object"
 
-    #MetadataElement(name="annotations", desc="Annotations added during processing", default=[], param=ListParameter, readonly=False, visible=True, no_value=[])
-    #
+    # MetadataElement(name="annotations",
+    #                 desc="Annotations added during processing",
+    #                 default=[], param=ListParameter, readonly=False, visible=True, no_value=[])
+
     # def __init__(self, **kwd):
     #     Json.__init__(self, **kwd)
-    #
+
     # def init_meta( self, dataset, copy_from=None ):
     #     Json.init_meta(self, dataset, copy_from=copy_from)
 
@@ -147,11 +149,10 @@ class Lif( Lapps ):
     header = '''{"discriminator":"http://vocab.lappsgrid.org/ns/media/jsonld'''
     blurb = "Lapps Interchange Format (LIF)"
 
-    # def __init__(self, **kwd):
-    #     Lapps.__init__(self, **kwd)
-    #
-    # def init_meta( self, dataset, copy_from=None ):
-    #     Lapps.init_meta(self, dataset, copy_from=copy_from)
+    # TODO: probably to be defined on the Lapps datatype
+    MetadataElement(name="annotations",
+                    desc="Annotations added during processing",
+                    default=[], param=ListParameter, readonly=False, visible=True, no_value=[])
 
     def sniff(self, filename):
         """
@@ -169,6 +170,28 @@ class Lif( Lapps ):
 
         log.info("Found a LIF file.")
         return True
+
+    def set_meta(self, dataset, **kwd):
+        """Set the annotations metadata list. Does nothing for now because it could not
+        be tested due to upload issues.
+
+        QUESTIONS:
+        - do we get the annotation types for all views or just the last one?
+        - do we use the metadata or the actual annnotations or both?
+        - are we interested in other metadata, for example the number of views?        
+        """
+        if False:
+            lif = LifObject(dataset)
+            # the annotations types expressed in the metadata of each view
+            metadata = lif.collect_meta_data()
+            # the annotation types actually found in each view
+            annotypes = lif.collect_annotation_types()
+            # for now, just return a list of all types found in all view metadata
+            for view_metadata in metadata:
+                for annotype in view_metadata:
+                    # TODO: this will probably cause some duplications since
+                    # types can occur in more than one view
+                    dataset.metadata.annotations.append(annotype)
 
 
 class Gate( Lapps ):
@@ -237,3 +260,35 @@ class LDC( Lapps ):
         return True
 
 
+class LifObject(object):
+
+    """Auxiliary class to help determine the metadata for a LIF file.  Maybe better
+    to fold this in with the Lif class."""
+
+    def __init__(self, dataset):
+        self.dataset = dataset
+        self.json = json.load(open(dataset.file_name, "r"))
+        self.meta = self.json['payload'].get('meta')
+        self.views = self.json['payload']['views']
+
+    def __str__(self):
+        return "<LifObject on '%s'>" % self.dataset.file_name
+
+    def collect_meta_data(self):
+        """Collect the annotation content from the views using the metadata."""
+        metadata = []
+        for view in self.views:
+            metadata.append(view['metadata']['contains'].keys())
+        return metadata
+
+    def collect_annotation_types(self):
+        """Collect the annotation content from the views using the actual
+        annotations."""
+        annotypes = []
+        for view in self.views:
+            view_annotypes = {}
+            for annotation in view['annotations']:
+                annotype = annotation['@type']
+                view_annotypes[annotype] = view_annotypes.get(annotype, 0) + 1
+            annotypes.append(view_annotypes)
+        return annotypes
