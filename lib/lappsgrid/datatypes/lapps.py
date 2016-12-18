@@ -10,10 +10,11 @@ import json
 import gzip
 import os
 import re
+import itertools
 
 import logging
 
-from galaxy.model.metadata import ListParameter
+from galaxy.model.metadata import ListParameter, DictParameter, MetadataParameter
 
 log = logging.getLogger(__name__)
 
@@ -149,49 +150,61 @@ class Lif( Lapps ):
     header = '''{"discriminator":"http://vocab.lappsgrid.org/ns/media/jsonld'''
     blurb = "Lapps Interchange Format (LIF)"
 
-    # TODO: probably to be defined on the Lapps datatype
-    MetadataElement(name="annotations",
-                    desc="Annotations added during processing",
+    MetadataElement(name="views", desc="Number of views",
+                    default=0, param=MetadataParameter, readonly=False, visible=True)
+    MetadataElement(name="declared_annotations1", desc="Annotations declared in all views",
                     default=[], param=ListParameter, readonly=False, visible=True, no_value=[])
+    MetadataElement(name="declared_annotations2", desc="Annotations declared in last view",
+                    default=[], param=ListParameter, readonly=False, visible=True, no_value=[])
+    MetadataElement(name="actual_annotations1", desc="Annotations found in all views",
+                    default={}, param=DictParameter, readonly=False, visible=True, no_value={})
+    MetadataElement(name="actual_annotations2", desc="Annotations found in last view",
+                    default={}, param=DictParameter, readonly=False, visible=True, no_value={})
+
 
     def sniff(self, filename):
-        """
-        Reads the start of the file (ignoring whitespace) looking for the
-        required LIF header.
+        """Reads the start of the file looking for the required LIF header.
 
         :param filename: The name of the file to be checked.
         :return: True if filename is a LIF file, False otherwise.
+
         """
         log.info("LIF: Sniffing %s", filename)
         with open(filename, "r") as fh:
             for c in self.header:
                 if c != self.read(fh):
                     return False
-
         log.info("Found a LIF file.")
         return True
 
-    def set_meta(self, dataset, **kwd):
-        """Set the annotations metadata list. Does nothing for now because it could not
-        be tested due to upload issues.
 
-        QUESTIONS:
-        - do we get the annotation types for all views or just the last one?
-        - do we use the metadata or the actual annnotations or both?
-        - are we interested in other metadata, for example the number of views?        
-        """
+    def init_meta( self, dataset, copy_from=None ):
+        # for some reason I have to add this here otherwise set_meta() is never executed
+        self.set_meta(dataset)
+
+    def set_meta(self, dataset, **kwd):
+        """Fill in dataset.metadata with number of views and declared (in the metadata)
+        and actual annotations in all the views and just the last view."""
+        lif = LifObject(dataset)
+        dataset.metadata.views = len(lif.views)
+        declared_annotations1 = lif.declared_annotations()
+        declared_annotations2 = lif.declared_annotations(last_only=True)
+        actual_annotations1 = lif.actual_annotations()
+        actual_annotations2 = lif.actual_annotations(last_only=True)
+        for annotation in declared_annotations1:
+            dataset.metadata.declared_annotations1.append(annotation)
+        for annotation in declared_annotations2:
+            dataset.metadata.declared_annotations2.append(annotation)
+        for annotation, count in actual_annotations1.items():
+            dataset.metadata.actual_annotations1[annotation] = count
+        for annotation, count in actual_annotations2.items():
+            dataset.metadata.actual_annotations2[annotation] = count
         if False:
-            lif = LifObject(dataset)
-            # the annotations types expressed in the metadata of each view
-            metadata = lif.collect_meta_data()
-            # the annotation types actually found in each view
-            annotypes = lif.collect_annotation_types()
-            # for now, just return a list of all types found in all view metadata
-            for view_metadata in metadata:
-                for annotype in view_metadata:
-                    # TODO: this will probably cause some duplications since
-                    # types can occur in more than one view
-                    dataset.metadata.annotations.append(annotype)
+            print 'dataset.metadata.views', dataset.metadata.views
+            print 'dataset.metadata.declared_annotations1', dataset.metadata.declared_annotations1
+            print 'dataset.metadata.declared_annotations2', dataset.metadata.declared_annotations2
+            print 'dataset.metadata.actual_annotations1', dataset.metadata.actual_annotations1
+            print 'dataset.metadata.actual_annotations2', dataset.metadata.actual_annotations2
 
 
 class Gate( Lapps ):
@@ -262,8 +275,7 @@ class LDC( Lapps ):
 
 class LifObject(object):
 
-    """Auxiliary class to help determine the metadata for a LIF file.  Maybe better
-    to fold this in with the Lif class."""
+    """Auxiliary class to help determine the metadata for a LIF file."""
 
     def __init__(self, dataset):
         self.dataset = dataset
@@ -274,21 +286,27 @@ class LifObject(object):
     def __str__(self):
         return "<LifObject on '%s'>" % self.dataset.file_name
 
-    def collect_meta_data(self):
-        """Collect the annotation content from the views using the metadata."""
-        metadata = []
-        for view in self.views:
-            metadata.append(view['metadata']['contains'].keys())
-        return metadata
+    def declared_annotations(self, last_only=False):
+        """Return the annotation content from all views using the metadata. Return only
+        the content of the last view if last_only is True. Do not return duplicates."""
+        idx = -1 if last_only else 0
+        types = [view['metadata']['contains'].keys() for view in self.views[idx:]]
+        # flatten the list of lists in types
+        return [shorten(annotation) for annotation in set(itertools.chain.from_iterable(types))]
 
-    def collect_annotation_types(self):
-        """Collect the annotation content from the views using the actual
-        annotations."""
-        annotypes = []
-        for view in self.views:
-            view_annotypes = {}
+    def actual_annotations(self, last_only=False):
+        """Collect the annotation content from all views using the actual
+        annotations. Report on just the last view if last_only=True."""
+        annotations = {}
+        idx = -1 if last_only else 0
+        for view in self.views[idx:]:
             for annotation in view['annotations']:
-                annotype = annotation['@type']
-                view_annotypes[annotype] = view_annotypes.get(annotype, 0) + 1
-            annotypes.append(view_annotypes)
-        return annotypes
+                annotype = shorten(annotation['@type'])
+                annotations[annotype] = annotations.get(annotype, 0) + 1
+        return annotations
+
+
+def shorten(annotation_type):
+    """Annotation types are URLs, just keep the last part because real estate in the
+    Galaxy GUI is limited."""
+    return annotation_type.split('/')[-1]
