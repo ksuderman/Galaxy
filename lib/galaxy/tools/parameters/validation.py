@@ -92,7 +92,9 @@ class ExpressionValidator( Validator ):
         self.expression = compile( expression, '<string>', 'eval' )
 
     def validate( self, value, trans=None ):
+        log.info("Validating value %s" % value)
         if not( eval( self.expression, dict( value=value ) ) ):
+            log.warn(self.expression)
             message = self.message
             if self.substitute_value_in_message:
                 message = message % value
