@@ -71,7 +71,6 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
 
         conda_exec = get_option("exec")
         debug = _string_as_bool(get_option("debug"))
-        verbose_install_check = _string_as_bool(get_option("verbose_install_check"))
         ensure_channels = get_option("ensure_channels")
         use_path_exec = get_option("use_path_exec")
         if use_path_exec is None:
@@ -99,7 +98,6 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
         self.ensure_conda_installed()
         self.auto_install = auto_install
         self.copy_dependencies = copy_dependencies
-        self.verbose_install_check = verbose_install_check
 
     def ensure_conda_installed(self):
         """
@@ -149,7 +147,7 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
 
         conda_target = CondaTarget(name, version=version)
         is_installed = is_conda_target_installed(
-            conda_target, conda_context=self.conda_context, verbose_install_check=self.verbose_install_check
+            conda_target, conda_context=self.conda_context
         )
 
         job_directory = kwds.get("job_directory", None)
@@ -165,6 +163,8 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
             else:
                 log.warning("Conda dependency resolver not sent job directory.")
                 return NullDependency(version=version, name=name)
+
+        preserve_python_environment = kwds.get("preserve_python_environment", False)
 
         if not is_installed and self.auto_install:
             is_installed = self.install_dependency(name=name, version=version, type=type)
@@ -192,7 +192,8 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
                 conda_environment,
                 exact,
                 name,
-                version
+                version,
+                preserve_python_environment,
             )
         else:
             if len(conda_environment) > 79:
@@ -220,7 +221,7 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
         conda_target = CondaTarget(name, version=version)
 
         is_installed = is_conda_target_installed(
-            conda_target, conda_context=self.conda_context, verbose_install_check=self.verbose_install_check
+            conda_target, conda_context=self.conda_context
         )
 
         if is_installed:
@@ -232,7 +233,7 @@ class CondaDependencyResolver(DependencyResolver, ListableDependencyResolver, In
         else:
             # Recheck if installed
             is_installed = is_conda_target_installed(
-                conda_target, conda_context=self.conda_context, verbose_install_check=self.verbose_install_check
+                conda_target, conda_context=self.conda_context
             )
         if not is_installed:
             log.debug("Removing failed conda install of {}, version '{}'".format(name, version))
@@ -249,12 +250,13 @@ class CondaDependency(Dependency):
     dict_collection_visible_keys = Dependency.dict_collection_visible_keys + ['environment_path', 'name', 'version']
     dependency_type = 'conda'
 
-    def __init__(self, activate, environment_path, exact, name=None, version=None):
+    def __init__(self, activate, environment_path, exact, name=None, version=None, preserve_python_environment=False):
         self.activate = activate
         self.environment_path = environment_path
         self._exact = exact
         self._name = name
         self._version = version
+        self._preserve_python_environment = preserve_python_environment
 
     @property
     def exact(self):
@@ -269,11 +271,19 @@ class CondaDependency(Dependency):
         return self._version
 
     def shell_commands(self, requirement):
-        return """[ "$CONDA_DEFAULT_ENV" = "%s" ] || . %s '%s' 2>&1 """ % (
-            self.environment_path,
-            self.activate,
-            self.environment_path
-        )
+        if self._preserve_python_environment:
+            # On explicit testing the only such requirement I am aware of is samtools - and it seems to work
+            # fine with just appending the PATH as done below. Other tools may require additional
+            # variables in the future.
+            return """export PATH=$PATH:'%s/bin' """ % (
+                self.environment_path,
+            )
+        else:
+            return """[ "$CONDA_DEFAULT_ENV" = "%s" ] || . %s '%s' 2>&1 """ % (
+                self.environment_path,
+                self.activate,
+                self.environment_path
+            )
 
 
 def _string_as_bool( value ):
