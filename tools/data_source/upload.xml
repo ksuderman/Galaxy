@@ -42,6 +42,7 @@
            Pull Request 171 for more information. -->
       <param name="uuid" type="hidden" required="False" />
       <param name="to_posix_lines" type="hidden" value="Yes" />
+      <param name="auto_decompress" type="hidden" value="Yes" />
       <!--
       <param name="to_posix_lines" type="select" display="checkboxes" multiple="True" label="Convert universal line endings to Posix line endings" help="Turn this option off if you upload a gzip, bz2 or zip archive which contains a binary file." value="Yes"> 
         <option value="Yes" selected="true">Yes</option>
@@ -53,7 +54,7 @@
       <param name="NAME" type="hidden" help="Name for dataset in upload"></param>
     </upload_dataset>
     <param name="dbkey" type="genomebuild" label="Genome" />
-    <conditional name="files_metadata" title="Specify metadata" value_from="self:app.datatypes_registry.get_upload_metadata_params" value_ref="file_type" value_ref_in_group="False" />
+    <conditional name="files_metadata" value_from="self:app.datatypes_registry.get_upload_metadata_params" value_ref="file_type" value_ref_in_group="False" />
     <!-- <param name="other_dbkey" type="text" label="Or user-defined Genome" /> -->
   </inputs>
   <help>

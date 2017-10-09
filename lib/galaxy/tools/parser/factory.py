@@ -1,24 +1,24 @@
 """Constructors for concrete tool and input source objects."""
 from __future__ import absolute_import
 
+import logging
+
 import yaml
-
-from .yaml import YamlToolSource
-from .xml import XmlToolSource
-from .xml import XmlInputSource
-from .cwl import CwlToolSource
-from .interface import InputSource
-
 
 from galaxy.tools.loader import load_tool as load_tool_xml
 from galaxy.util.odict import odict
 
+from .cwl import CwlToolSource
+from .interface import InputSource
+from .xml import XmlInputSource, XmlToolSource
+from .yaml import YamlToolSource
 
-import logging
+from ..fetcher import ToolLocationFetcher
+
 log = logging.getLogger(__name__)
 
 
-def get_tool_source(config_file=None, xml_tree=None, enable_beta_formats=True):
+def get_tool_source(config_file=None, xml_tree=None, enable_beta_formats=True, tool_location_fetcher=None):
     """Return a ToolSource object corresponding to supplied source.
 
     The supplied source may be specified as a file path (using the config_file
@@ -29,6 +29,10 @@ def get_tool_source(config_file=None, xml_tree=None, enable_beta_formats=True):
     elif config_file is None:
         raise ValueError("get_tool_source called with invalid config_file None.")
 
+    if tool_location_fetcher is None:
+        tool_location_fetcher = ToolLocationFetcher()
+
+    config_file = tool_location_fetcher.to_tool_path(config_file)
     if not enable_beta_formats:
         tree = load_tool_xml(config_file)
         return XmlToolSource(tree, source_path=config_file)
@@ -73,4 +77,4 @@ def get_input_source(content):
     return content
 
 
-__all__ = ["get_tool_source", "get_input_source"]
+__all__ = ("get_tool_source", "get_input_source")

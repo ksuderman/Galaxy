@@ -16,10 +16,7 @@ var _super = DATASET_LI.DatasetListItemView;
 var HDAListItemView = _super.extend(
 /** @lends HDAListItemView.prototype */{
 
-    /** logger used to record this.log messages, commonly set to console */
-    //logger              : console,
-
-    className   : _super.prototype.className + " history-content",
+    className : _super.prototype.className + " history-content",
 
     initialize : function( attributes, options ){
         _super.prototype.initialize.call( this, attributes, options );
@@ -36,7 +33,6 @@ var HDAListItemView = _super.extend(
 // ............................................................................ TEMPLATES
 /** underscore templates */
 HDAListItemView.prototype.templates = (function(){
-//TODO: move to require text! plugin
 
     var titleBarTemplate = BASE_MVC.wrapTemplate([
         // adding the hid display to the title
@@ -47,6 +43,14 @@ HDAListItemView.prototype.templates = (function(){
                 '<span class="hid"><%- dataset.hid %></span> ',
                 '<span class="name"><%- dataset.name %></span>',
             '</div>',
+            '</br>',
+            '<span class="nametags">',
+                '<% _.each(_.sortBy(_.uniq(dataset.tags), function(x) { return x }), function(tag){ %>',
+                    '<% if (tag.indexOf("name:") == 0){ %>',
+                        '<span class="label label-info"><%- tag.slice(5) %></span>',
+                    '<% } %>',
+                '<% }); %>',
+            '</span>',
         '</div>'
     ], 'dataset' );
 

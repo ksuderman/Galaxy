@@ -9,8 +9,9 @@ define([
     "mvc/dataset/data",
     "mvc/tool/tools",
     "utils/config",
+    "viz/bbi-data-manager",
     "ui/editable-text",
-], function(_, visualization, viz_views, util, slotting, painters, filters_mod, data, tools_mod, config_mod) {
+], function(_, visualization, viz_views, util, slotting, painters, filters_mod, data, tools_mod, config_mod, bbi) {
 
 
 var extend = _.extend;
@@ -185,6 +186,25 @@ function round(num, places) {
 
     var val = Math.pow(10, places);
     return Math.round(num * val) / val;
+}
+
+/**
+ * Check if a server can do byte range requests.
+ */
+function supportsByteRanges(url) {
+    var promise = $.Deferred();
+    $.ajax({
+        type: 'HEAD',
+        url: url,
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("Range", "bytes=0-10");
+        },
+        success: function(result, status, xhr) {
+            promise.resolve(xhr.status === 206);
+        }
+    });
+
+    return promise;
 }
 
 /**
@@ -771,7 +791,7 @@ extend(DrawableGroup.prototype, Drawable.prototype, DrawableCollection.prototype
             // For all tracks, save current filter manager and set manager to shared (this object's) manager.
             this.saved_filters_managers = [];
             for (var i = 0; i < this.drawables.length; i++) {
-                drawable = this.drawables[i];
+                var drawable = this.drawables[i];
                 this.saved_filters_managers.push(drawable.filters_manager);
                 drawable.filters_manager = this.filters_manager;
             }
@@ -889,7 +909,7 @@ var TracksterView = Backbone.View.extend({
         // Introduction div shown when there are no tracks.
         this.intro_div = $("<div/>").addClass("intro").appendTo(this.viewport_container);
         var add_tracks_button = $("<div/>").text("Add Datasets to Visualization").addClass("action-button").appendTo(this.intro_div).click(function () {
-            visualization.select_datasets(Galaxy.root + "visualization/list_current_history_datasets", Galaxy.root + "api/datasets", { 'f-dbkey': view.dbkey }, function(tracks) {
+            visualization.select_datasets({ 'dbkey': view.dbkey }, function(tracks) {
                 _.each(tracks, function(track) {
                     view.add_drawable( object_from_template(track, view, view) );
                 });
@@ -1202,18 +1222,23 @@ extend( TracksterView.prototype, DrawableCollection.prototype, {
                     view.reference_track = ref_track;
                 }
                 view.chrom_data = result.chrom_info;
-                var chrom_options = '<option value="">Select Chrom/Contig</option>';
+                
+                view.chrom_select.html('');
+                view.chrom_select.append($('<option value="">Select Chrom/Contig</option>'));
+
                 for (var i = 0, len = view.chrom_data.length; i < len; i++) {
                     var chrom = view.chrom_data[i].chrom;
-                    chrom_options += '<option value="' + chrom + '">' + chrom + '</option>';
+                    var chrom_option  = $("<option>");
+                    chrom_option.text(chrom);
+                    chrom_option.val(chrom);
+                    view.chrom_select.append(chrom_option);
                 }
                 if (result.prev_chroms) {
-                    chrom_options += '<option value="previous">Previous ' + MAX_CHROMS_SELECTABLE + '</option>';
+                    view.chrom_select.append($('<option value="previous">Previous ' + MAX_CHROMS_SELECTABLE + '</option>'));
                 }
                 if (result.next_chroms) {
-                    chrom_options += '<option value="next">Next ' + MAX_CHROMS_SELECTABLE + '</option>';
+                    view.chrom_select.append($('<option value="next">Next ' + MAX_CHROMS_SELECTABLE + '</option>'));
                 }
-                view.chrom_select.html(chrom_options);
                 view.chrom_start_index = result.start_index;
 
                 chrom_data.resolve(result.chrom_info);
@@ -1674,7 +1699,7 @@ var TracksterToolView = Backbone.View.extend({
      * Render tool UI.
      */
     render: function() {
-        var self = this;
+        var self = this,
             tool = this.model,
             parent_div = this.$el.addClass("dynamic-tool").hide();
 
@@ -3078,7 +3103,7 @@ extend(TiledTrack.prototype, Drawable.prototype, Track.prototype, {
         if ( [undefined, null, 0].indexOf(this.config.get_value("max_value")) !== -1 ) {
             this.config.set_value("max_value", _.max( _.map(result.data, function(d) { return d[1]; }) ) || 0);
         }
-        
+
         var canvas = ctx.canvas,
             painter = new painters.LinePainter(result.data, region.get('start'), region.get('end'), this.config.to_key_value_dict(), mode);
         painter.draw(ctx, canvas.width, canvas.height, w_scale);
@@ -3601,7 +3626,23 @@ extend(ReferenceTrack.prototype, Drawable.prototype, TiledTrack.prototype, {
 var LineTrack = function (view, container, obj_dict) {
     this.mode = "Histogram";
     TiledTrack.call(this, view, container, obj_dict);
+    // Need left offset for drawing overlap near tile boundaries.
+    this.left_offset = 30;
+
+    // If server has byte-range support, use BBI data manager to read directly from the BBI file.
+    // FIXME: there should be a flag to wait for this check to complete before loading the track.
+    var self = this;
+    $.when(supportsByteRanges(Galaxy.root + 'datasets/' + this.dataset.id + '/display'))
+     .then(function(supportsByteRanges) {
+         if (supportsByteRanges) {
+             self.data_manager = new bbi.BBIDataManager({
+                 dataset: self.dataset
+             });
+         }
+
+    });
 };
+
 extend(LineTrack.prototype, Drawable.prototype, TiledTrack.prototype, {
     display_modes: CONTINUOUS_DATA_MODES,
 
@@ -3918,6 +3959,7 @@ extend(FeatureTrack.prototype, Drawable.prototype, TiledTrack.prototype, {
      * Returns appropriate display mode based on data.
      */
     get_mode: function(data) {
+        var mode;
         // HACK: use no_detail mode track is in overview to prevent overview from being too large.
         if (data.extra_info === "no_detail" || this.is_overview) {
             mode = "no_detail";
@@ -3989,7 +4031,7 @@ extend(FeatureTrack.prototype, Drawable.prototype, TiledTrack.prototype, {
         // Preprocessing: filter features and determine whether all unfiltered features have been slotted.
         var
             filtered = [],
-            slots = this.slotters[w_scale].slots;
+            slots = this.slotters[w_scale].slots,
             all_slotted = true;
         if ( result.data ) {
             var filters = this.filters_manager.filters;

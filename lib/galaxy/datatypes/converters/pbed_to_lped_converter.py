@@ -49,7 +49,7 @@ def main():
     """
     need to work with rgenetics composite datatypes
     so in and out are html files with data in extrafiles path
-    <command interpreter="python">pbed_to_lped_converter.py '$input1/$input1.metadata.base_name'
+    <command>python '$__tool_directory__/pbed_to_lped_converter.py' '$input1/$input1.metadata.base_name'
     '$output1' '$output1.extra_files_path' '${GALAXY_DATA_INDEX_DIR}/rg/bin/plink'
     </command>
     """
@@ -72,7 +72,7 @@ def main():
         s = '## Rgenetics: http://bitbucket.org/rgalaxy Galaxy Tools %s %s' % (prog, timenow())  # becomes info
         print(s)
         f.write('<div>%s\n<ol>' % (s))
-        for i, data in enumerate( flist ):
+        for i, data in enumerate(flist):
             f.write('<li><a href="%s">%s</a></li>\n' % (os.path.split(data)[-1], os.path.split(data)[-1]))
         f.write("</ol></div></div></body></html>")
 

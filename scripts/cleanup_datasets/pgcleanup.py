@@ -14,13 +14,12 @@ import shutil
 import sys
 from optparse import OptionParser
 
+import psycopg2
 from six.moves.configparser import ConfigParser
+from sqlalchemy.engine.url import make_url
 
 galaxy_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
 sys.path.insert(1, os.path.join(galaxy_root, 'lib'))
-
-import psycopg2
-from sqlalchemy.engine.url import make_url
 
 import galaxy.config
 from galaxy.exceptions import ObjectNotFound
@@ -73,9 +72,9 @@ class Cleanup(object):
         parser.add_option('-U', '--no-update-time', action='store_false', dest='update_time', help="Don't set update_time on updated objects", default=True)
         parser.add_option('-s', '--sequence', dest='sequence', help='Comma-separated sequence of actions, chosen from: %s' % self.action_names, default='')
         parser.add_option('-w', '--work-mem', dest='work_mem', help='Set PostgreSQL work_mem for this connection', default=None)
-        ( self.options, self.args ) = parser.parse_args()
+        (self.options, self.args) = parser.parse_args()
 
-        self.options.sequence = [ x.strip() for x in self.options.sequence.split(',') ]
+        self.options.sequence = [x.strip() for x in self.options.sequence.split(',')]
 
         if self.options.sequence == ['']:
             print("Error: At least one action must be specified in the action sequence\n")
@@ -106,7 +105,7 @@ class Cleanup(object):
         url = make_url(self.config.database_connection)
 
         log.info('Connecting to database with URL: %s' % url)
-        args = url.translate_connect_args( username='user' )
+        args = url.translate_connect_args(username='user')
         args.update(url.query)
 
         assert url.get_dialect().name == 'postgresql', 'This script can only be used with PostgreSQL.'
@@ -768,6 +767,7 @@ class Cleanup(object):
                         self._log('Removal of %s failed with error: %s' % (extra_files_dir, e))
 
         self._close_logfile()
+
 
 if __name__ == '__main__':
     cleanup = Cleanup()

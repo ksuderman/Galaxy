@@ -9,8 +9,8 @@ from xml.etree import ElementTree as ET
 
 from .resolver_mixins import (
     UsesHomebrewMixin,
-    UsesToolDependencyDirMixin,
     UsesInstalledRepositoriesMixin,
+    UsesToolDependencyDirMixin,
 )
 from ..resolvers import DependencyResolver, NullDependency
 
@@ -29,7 +29,8 @@ class HomebrewToolShedDependencyResolver(
         self._init_homebrew(**kwds)
         self._init_base_path(dependency_manager, **kwds)
 
-    def resolve(self, name, version, type, **kwds):
+    def resolve(self, requirement, **kwds):
+        name, version, type = requirement.name, requirement.version, requirement.type
         if type != "package":
             return NullDependency(version=version, name=name)
         if version is None:
@@ -146,4 +147,4 @@ def build_recipe_name(package_name, package_version, repository_owner, repositor
     return base
 
 
-__all__ = ['HomebrewToolShedDependencyResolver']
+__all__ = ('HomebrewToolShedDependencyResolver', )

@@ -15,17 +15,13 @@ var _super = DC_LI.DCListItemView;
 var HDCAListItemView = _super.extend(
 /** @lends HDCAListItemView.prototype */{
 
-    /** logger used to record this.log messages, commonly set to console */
-    //logger              : console,
-
     className   : _super.prototype.className + " history-content",
 
     /** event listeners */
     _setUpListeners : function(){
         _super.prototype._setUpListeners.call( this );
-
         this.listenTo( this.model, {
-            'change:populated change:visible' : function( model, options ){ this.render(); },
+            'change:tags change:populated change:visible' : function( model, options ){ this.render(); },
         });
     },
 
@@ -47,7 +43,7 @@ var HDCAListItemView = _super.extend(
     /** In this override, add the state as a class for use with state-based CSS */
     _swapNewRender : function( $newRender ){
         _super.prototype._swapNewRender.call( this, $newRender );
-//TODO: model currently has no state
+        //TODO: model currently has no state
         var state = !this.model.get( 'populated' ) ? STATES.RUNNING : STATES.OK;
         //if( this.model.has( 'state' ) ){
         this.$el.addClass( 'state-' + state );
@@ -88,6 +84,13 @@ HDCAListItemView.prototype.templates = (function(){
                 '<span class="name"><%- collection.name %></span>',
             '</div>',
             '<div class="subtitle"></div>',
+            '<span class="nametags">',
+                '<% _.each(_.sortBy(_.uniq(collection.tags), function(x) { return x }), function(tag){ %>',
+                    '<% if (tag.indexOf("name:") == 0){ %>',
+                        '<span class="label label-info"><%- tag.slice(5) %></span>',
+                    '<% } %>',
+                '<% }); %>',
+            '</span>',
         '</div>'
     ], 'collection' );
 

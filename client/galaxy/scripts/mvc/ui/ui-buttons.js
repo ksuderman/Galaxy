@@ -6,7 +6,6 @@ define( [ 'utils/utils' ], function( Utils ) {
             this.model = options && options.model || new Backbone.Model({
                 id          : Utils.uid(),
                 title       : '',
-                floating    : 'right',
                 icon        : '',
                 cls         : 'btn btn-default',
                 wait        : false,
@@ -31,7 +30,6 @@ define( [ 'utils/utils' ], function( Utils ) {
                     .addClass( options.disabled && 'disabled' )
                     .attr( 'id', options.id )
                     .attr( 'disabled', options.disabled )
-                    .css( 'float', options.floating )
                     .off( 'click' ).on( 'click' , function() {
                         $( '.tooltip' ).hide();
                         options.onclick && !self.disabled && options.onclick();
@@ -112,6 +110,7 @@ define( [ 'utils/utils' ], function( Utils ) {
                              title      : options.title,
                              target     : options.target || '_top',
                              disabled   : options.disabled } )
+                    .tooltip( { placement: 'bottom' } )
                     .off( 'click' ).on( 'click' , function() {
                         options.onclick && !options.disabled && options.onclick();
                     });
@@ -173,7 +172,6 @@ define( [ 'utils/utils' ], function( Utils ) {
             this.model = options && options.model || new Backbone.Model({
                 id          : Utils.uid(),
                 title       : '',
-                floating    : 'right',
                 icon        : '',
                 cls         : 'ui-button-icon',
                 disabled    : false
@@ -192,7 +190,6 @@ define( [ 'utils/utils' ], function( Utils ) {
                     .addClass( options.disabled && 'disabled' )
                     .attr( 'disabled', options.disabled )
                     .attr( 'id', options.id )
-                    .css( 'float', options.floating )
                     .off( 'click' ).on( 'click', function() {
                         $( '.tooltip' ).hide();
                         !options.disabled && options.onclick && options.onclick();
@@ -211,7 +208,6 @@ define( [ 'utils/utils' ], function( Utils ) {
             this.model = options && options.model || new Backbone.Model({
                 id              : '',
                 title           : '',
-                floating        : 'right',
                 pull            : 'right',
                 icon            : null,
                 onclick         : null,
@@ -223,9 +219,11 @@ define( [ 'utils/utils' ], function( Utils ) {
                 visible         : true,
                 tag             : ''
             }).set( options );
+            this.collection = new Backbone.Collection();
             this.setElement( $( '<div/>' ).append( this.$root = $( '<div/>' ).append( this.$icon  = $( '<i/>' ) )
                                                                              .append( this.$title = $( '<span/>' ) ) ) );
             this.listenTo( this.model, 'change', this.render, this );
+            this.listenTo( this.collection, 'change add remove reset', this.render, this );
             this.render();
         },
 
@@ -236,8 +234,7 @@ define( [ 'utils/utils' ], function( Utils ) {
                     .addClass( 'dropdown' )
                     .addClass( options.cls )
                     .attr( 'id', options.id )
-                    .css( { float   : options.floating,
-                            display : options.visible ? 'block' : 'none' } );
+                    .css( { display : options.visible && this.collection.where( { visible: true } ).length > 0 ? 'block' : 'none' } );
             this.$root.addClass( 'root button dropdown-toggle' )
                       .attr( 'data-toggle', 'dropdown' )
                       .tooltip( { title: options.tooltip, placement: 'bottom' } )
@@ -249,40 +246,46 @@ define( [ 'utils/utils' ], function( Utils ) {
             this.$icon.removeClass().addClass( 'icon fa' ).addClass( options.icon );
             this.$title.removeClass().addClass( 'title' ).html( options.title );
             options.icon && options.title && this.$icon.addClass( 'ui-margin-right' );
+            this.$menu && this.$menu.remove();
+            if ( this.collection.length > 0 ) {
+                this.$menu = $( '<ul/>' ).addClass( 'menu dropdown-menu' )
+                                         .addClass( 'pull-' + self.model.get( 'pull' ) )
+                                         .attr( 'role', 'menu' );
+                this.$el.append( this.$menu );
+            }
+            this.collection.each( function( submodel ) {
+                var suboptions = submodel.attributes;
+                if ( suboptions.visible ) {
+                    var $link = $( '<a/>' ).addClass( 'dropdown-item' )
+                                           .attr( { href : suboptions.href, target : suboptions.target } )
+                                           .append( $( '<i/>' ).addClass( 'fa' )
+                                                               .addClass( suboptions.icon )
+                                                               .css( 'display', suboptions.icon ? 'inline-block' : 'none' ) )
+                                           .append( suboptions.title )
+                                           .on( 'click', function( e ) {
+                                                if ( suboptions.onclick ) {
+                                                    e.preventDefault();
+                                                    suboptions.onclick();
+                                                }
+                                           } );
+                    self.$menu.append( $( '<li/>' ).append( $link ) );
+                    suboptions.divider && self.$menu.append( $( '<li/>' ).addClass( 'divider' ) );
+                }
+            });
         },
 
         /** Add a new menu item */
         addMenu: function ( options ) {
-            var options = Utils.merge( options, {
+            this.collection.add( Utils.merge( options, {
                 title       : '',
                 target      : '',
                 href        : '',
                 onclick     : null,
                 divider     : false,
+                visible     : true,
                 icon        : null,
                 cls         : 'button-menu btn-group'
-            });
-            if ( !this.$menu ) {
-                this.$menu = $( '<ul/>' ).addClass( 'menu dropdown-menu' )
-                                         .addClass( 'pull-' + this.model.get( 'pull' ) )
-                                         .attr( 'role', 'menu' );
-                this.$el.append( this.$menu );
-            }
-            var $link = $( '<a/>' ).addClass( 'dropdown-item' )
-                                   .attr( { href    : options.href,
-                                            target  : options.target } )
-                                   .append( $( '<i/>' ).addClass( 'fa' )
-                                                       .addClass( options.icon )
-                                                       .css( 'display', options.icon ? 'inline-block' : 'none' ) )
-                                   .append( options.title )
-                                   .on( 'click', function( e ) {
-                                        if ( options.onclick ) {
-                                            e.preventDefault();
-                                            options.onclick();
-                                        }
-                                   } );
-            this.$menu.append( $( '<li/>' ).append( $link ) );
-            options.divider && this.$menu.append( $( '<li/>' ).addClass( 'divider' ) );
+            }));
         }
     });
 

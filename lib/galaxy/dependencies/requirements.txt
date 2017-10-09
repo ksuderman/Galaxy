@@ -13,6 +13,7 @@ pycrypto
 #python_lzo
 
 # pure Python packages
+bz2file; python_version < '3.3'
 Paste
 PasteDeploy
 docutils
@@ -30,6 +31,7 @@ nose
 Parsley
 six
 Whoosh
+galaxy_sequence_utils
 
 # Cheetah and dependencies
 Cheetah
@@ -67,4 +69,4 @@ ecdsa
 # We still pin these dependencies because of modifications to the upstream packages
 
 # Flexible BAM index naming
-pysam==0.8.4+gx1
+pysam==0.8.4+gx5

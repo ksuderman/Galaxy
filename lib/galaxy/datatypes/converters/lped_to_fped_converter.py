@@ -81,7 +81,7 @@ def main():
     """call fbater
     need to work with rgenetics composite datatypes
     so in and out are html files with data in extrafiles path
-    <command interpreter="python">rg_convert_lped_fped.py '$input1/$input1.metadata.base_name'
+    <command>python '$__tool_directory__/rg_convert_lped_fped.py' '$input1/$input1.metadata.base_name'
     '$output1' '$output1.extra_files_path'
     </command>
     """
@@ -102,7 +102,7 @@ def main():
         f.write(galhtmlprefix % prog)
         print('## Rgenetics: http://rgenetics.org Galaxy Tools %s %s' % (prog, timenow()))  # becomes info
         f.write('<div>## Rgenetics: http://rgenetics.org Galaxy Tools %s %s\n<ol>' % (prog, timenow()))
-        for i, data in enumerate( flist ):
+        for i, data in enumerate(flist):
             f.write('<li><a href="%s">%s</a></li>\n' % (os.path.split(data)[-1], os.path.split(data)[-1]))
         f.write("</div></body></html>")
 

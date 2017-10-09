@@ -2,11 +2,13 @@
 Neo4j Composite Dataset
 """
 import logging
-import sys
-import shutil
 import os
-from galaxy.datatypes.images import Html
+import shutil
+import sys
+
 from galaxy.datatypes.data import Data
+from galaxy.datatypes.images import Html
+from galaxy.util import FILENAME_VALID_CHARS
 
 gal_Log = logging.getLogger(__name__)
 verbose = True
@@ -18,6 +20,7 @@ class Neo4j(Html):
     derived from html - composite datatype elements
     stored in extra files path
     """
+
     def generate_primary_file(self, dataset=None):
         """
         This is called only at upload to write the html file
@@ -27,7 +30,7 @@ class Neo4j(Html):
             '<html><head><title>Files for Composite Dataset (%s)</title></head><p/>\
             This composite dataset is composed of the following files:<p/><ul>' % (
                 self.file_ext)]
-        for composite_name, composite_file in self.get_composite_files(dataset=dataset).iteritems():
+        for composite_name, composite_file in self.get_composite_files(dataset=dataset).items():
             opt_text = ''
             if composite_file.optional:
                 opt_text = ' (optional)'
@@ -69,8 +72,7 @@ class Neo4j(Html):
             dir_name = str(os.path.dirname(trans.app.object_store.get_filename(data.dataset))) + neo4j_dir_name
 
             # generate unique filename for this dataset
-            valid_chars = '.,^_-()[]0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-            fname = ''.join(c in valid_chars and c or '_' for c in data.name)[0:150]
+            fname = ''.join(c in FILENAME_VALID_CHARS and c or '_' for c in data.name)[0:150]
 
             # zip the target directory (dir_name) using the fname
             shutil.make_archive(fname, 'zip', dir_name)
@@ -126,6 +128,7 @@ class Neo4jDB(Neo4j, Data):
         self.add_composite_file('neostore.schemastore.db', is_binary=True)
         self.add_composite_file('neostore.schemastore.db.id', is_binary=True)
         self.add_composite_file('neostore.transaction.db.0', is_binary=True)
+
 
 if __name__ == '__main__':
     import doctest

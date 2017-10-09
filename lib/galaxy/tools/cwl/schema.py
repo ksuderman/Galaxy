@@ -1,14 +1,15 @@
 """Abstraction around cwltool and related libraries for loading a CWL artifact."""
-from collections import namedtuple
 import os
+
+from collections import namedtuple
 
 from six.moves.urllib.parse import urldefrag
 
 from .cwltool_deps import (
     ensure_cwltool_available,
+    load_tool,
     schema_salad,
     workflow,
-    load_tool,
 )
 
 RawProcessReference = namedtuple("RawProcessReference", ["process_object", "uri"])
@@ -23,11 +24,8 @@ class SchemaLoader(object):
 
     @property
     def raw_document_loader(self):
-        if self._raw_document_loader is None:
-            ensure_cwltool_available()
-            self._raw_document_loader = schema_salad.ref_resolver.Loader({"cwl": "https://w3id.org/cwl/cwl#", "id": "@id"})
-
-        return self._raw_document_loader
+        ensure_cwltool_available()
+        return schema_salad.ref_resolver.Loader({"cwl": "https://w3id.org/cwl/cwl#", "id": "@id"})
 
     def raw_process_reference(self, path):
         uri = "file://" + os.path.abspath(path)
@@ -68,4 +66,6 @@ class SchemaLoader(object):
         )
         return tool
 
+
 schema_loader = SchemaLoader()
+non_strict_schema_loader = SchemaLoader(strict=False)

@@ -251,16 +251,20 @@ var TabularDatasetChunkedView = Backbone.View.extend({
             }, this);
             row.append(this._renderCell(cells.slice(num_columns - 1).join('\t'), num_columns - 1));
         }
-        else if (num_columns > 5 && cells.length === num_columns - 1 ) {
-            // SAM file or like format with optional metadata missing.
+        else if (cells.length === 1){
+            // Comment line, just return the one cell.
+            row.append(this._renderCell(line, 0, num_columns));
+        }
+        else {
+            // cells.length is greater than one, but less than num_columns.  Render cells and pad tds.
+            // Possibly a SAM file or like format with optional metadata missing.
+            // Could also be a tabular file with a line with missing columns.
             _.each(cells, function(cell_contents, index) {
                 row.append(this._renderCell(cell_contents, index));
             }, this);
-            row.append($('<td>'));
-        }
-        else {
-            // Comment line, just return the one cell.
-            row.append(this._renderCell(line, 0, num_columns));
+            _.each(_.range(num_columns - cells.length), function(){
+                row.append($('<td>'));
+            });
         }
 
         this.row_count++;
@@ -287,7 +291,7 @@ var TopLevelTabularDatasetChunkedView = TabularDatasetChunkedView.extend({
         TabularDatasetChunkedView.prototype.initialize.call(this, options);
 
         // Scrolling happens in top-level elements.
-        scroll_elt = _.find(this.$el.parents(), function(p) {
+        var scroll_elt = _.find(this.$el.parents(), function(p) {
             return $(p).css('overflow') === 'auto';
         });
 
@@ -332,7 +336,7 @@ var EmbeddedTabularDatasetChunkedView = TabularDatasetChunkedView.extend({
 
 });
 
-// button for trackster visualization
+/** Button for trackster visualization */
 var TabularButtonTracksterView = Backbone.View.extend({
 
     // gene region columns
@@ -387,11 +391,9 @@ var TabularButtonTracksterView = Backbone.View.extend({
         this.file_ext = model.get('file_ext');
 
         // check for bed-file format
-        if (this.file_ext == 'bed')
-        {
+        if (this.file_ext == 'bed') {
             // verify that metadata exists
-            if (metadata.get('chromCol') && metadata.get('startCol') && metadata.get('endCol'))
-            {
+            if (metadata.get('chromCol') && metadata.get('startCol') && metadata.get('endCol')) {
                 // read in columns
                 this.col.chrom   = metadata.get('chromCol') - 1;
                 this.col.start   = metadata.get('startCol') - 1;
@@ -403,8 +405,7 @@ var TabularButtonTracksterView = Backbone.View.extend({
         }
 
         // check for vcf-file format
-        if (this.file_ext == 'vcf')
-        {
+        if (this.file_ext == 'vcf') {
             // search array
             function search (str, array) {
                 for (var j = 0; j < array.length; j++)
@@ -469,15 +470,16 @@ var TabularButtonTracksterView = Backbone.View.extend({
         this.hide();
     },
 
-    // backbone events
-    events:
-    {
+    /** Add event handlers */
+    events: {
         'mouseover tr'  : 'show',
         'mouseleave'    : 'hide'
     },
 
     // show button
     show: function (e) {
+        var self = this;
+
         // is numeric
         function is_numeric(n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
@@ -514,7 +516,12 @@ var TabularButtonTracksterView = Backbone.View.extend({
             // update css
             $('#btn_viz').css({'position': 'fixed', 'top': top + 'px', 'left': left + 'px'});
             $('#btn_viz').off('click');
-            $('#btn_viz').click(this.create_trackster_action(this.url_viz, btn_viz_pars, this.genome_build));
+            $('#btn_viz').click( function() {
+                self.frame.add({
+                    title   : 'Trackster',
+                    url     : self.url_viz + '/trackster?' + $.param(btn_viz_pars)
+                });
+            });
 
             // show the button
             $('#btn_viz').show();
@@ -524,92 +531,9 @@ var TabularButtonTracksterView = Backbone.View.extend({
         }
     },
 
-    // hide button
+    /** hide button */
     hide: function () {
-        this.$el.find('#btn_viz').hide();
-    },
-
-    // create action
-    create_trackster_action : function (vis_url, dataset_params, dbkey) {
-        // link this
-        var self = this;
-
-        // create function
-        return function() {
-            var listTracksParams = {};
-            if (dbkey) {
-                listTracksParams[ 'f-dbkey' ] = dbkey;
-            }
-            $.ajax({
-                url: vis_url + '/list_tracks?' + $.param( listTracksParams ),
-                dataType: 'html',
-                error: function() {
-                    // show error message
-                    self.modal.show({
-                        title   : 'Something went wrong!',
-                        body    : 'Unfortunately we could not add this dataset to the track browser. Please try again or contact us.',
-                        buttons : {
-                            'Cancel': function(){
-                                self.modal.hide();
-                            }
-                        }
-                    });
-                },
-                success: function(table_html) {
-                    self.modal.show({
-                        title   : 'View Data in a New or Saved Visualization',
-                        buttons :{
-                            'Cancel': function(){
-                                self.modal.hide();
-                            },
-                            'View in saved visualization': function(){
-                                // show modal with saved visualizations
-                                self.modal.show(
-                                {
-                                    title   : 'Add Data to Saved Visualization',
-                                    body    : table_html,
-                                    buttons : {
-                                        'Cancel': function(){
-                                            self.modal.hide();
-                                        },
-                                        'Add to visualization': function(){
-                                            // hide
-                                            self.modal.hide();
-
-                                            // search selected fields
-                                            self.modal.$el.find('input[name=id]:checked').each(function(){
-                                                // get visualization id
-                                                var vis_id = $(this).val();
-                                                dataset_params.id = vis_id;
-
-                                                // add widget
-                                                self.frame.add({
-                                                    title    : 'Trackster',
-                                                    type     : 'url',
-                                                    content  : vis_url + '/trackster?' + $.param(dataset_params)
-                                                });
-                                            });
-                                        }
-                                    }
-                                });
-                            },
-                            'View in new visualization': function(){
-                                // hide
-                                self.modal.hide();
-
-                                // add widget
-                                self.frame.add({
-                                    title    : 'Trackster',
-                                    type     : 'url',
-                                    content  : vis_url + '/trackster?' + $.param(dataset_params)
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-            return false;
-        };
+        this.$('#btn_viz').hide();
     }
 });
 

@@ -23,7 +23,7 @@ bx-python
 MarkupSafe
 PyYAML
 SQLAlchemy
-mercurial
+mercurial!=4.1.1 #conda's mercurial 4.1.1. is broken
 pycrypto
 
 # Install python_lzo if you want to support indexed access to lzo-compressed
@@ -72,4 +72,4 @@ Fabric
 # We still pin these dependencies because of modifications to the upstream packages
 
 # Flexible BAM index naming
-#pysam==0.8.4+gx1
+#pysam==0.8.4+gx5

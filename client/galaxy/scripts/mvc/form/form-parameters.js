@@ -6,14 +6,16 @@ define(['utils/utils',
         'mvc/ui/ui-select-content',
         'mvc/ui/ui-select-library',
         'mvc/ui/ui-select-ftp',
+        'mvc/ui/ui-select-genomespace',
         'mvc/ui/ui-color-picker'],
-    function( Utils, Ui, SelectContent, SelectLibrary, SelectFtp, ColorPicker ) {
+    function( Utils, Ui, SelectContent, SelectLibrary, SelectFtp, SelectGenomeSpace, ColorPicker ) {
 
     // create form view
     return Backbone.Model.extend({
         /** Available parameter types */
         types: {
             'text'              : '_fieldText',
+            'password'          : '_fieldText',
             'select'            : '_fieldSelect',
             'data_column'       : '_fieldSelect',
             'genomebuild'       : '_fieldSelect',
@@ -28,7 +30,9 @@ define(['utils/utils',
             'hidden_data'       : '_fieldHidden',
             'baseurl'           : '_fieldHidden',
             'library_data'      : '_fieldLibrary',
-            'ftpfile'           : '_fieldFtp'
+            'ftpfile'           : '_fieldFtp',
+            'upload'            : '_fieldUpload',
+            'genomespacefile'   : '_fieldGenomeSpace'
         },
 
         /** Returns an input field for a given field type */
@@ -100,7 +104,9 @@ define(['utils/utils',
                 error_text  : input_def.error_text || 'No options available',
                 multiple    : input_def.multiple,
                 optional    : input_def.optional,
-                onchange    : input_def.onchange
+                onchange    : input_def.onchange,
+                individual  : input_def.individual,
+                searchable  : input_def.flavor !== 'workflow'
             });
         },
 
@@ -145,8 +151,11 @@ define(['utils/utils',
             // create input element
             return new Ui.Input({
                 id          : 'field-' + input_def.id,
+                type        : input_def.type,
                 area        : input_def.area,
+                readonly    : input_def.readonly,
                 placeholder : input_def.placeholder,
+                datalist    : input_def.datalist,
                 onchange    : input_def.onchange
             });
         },
@@ -199,13 +208,32 @@ define(['utils/utils',
             });
         },
 
-        /** FTP file field
-        */
+        /** FTP file field */
         _fieldFtp: function( input_def ) {
             return new SelectFtp.View({
                 id          : 'field-' + input_def.id,
                 optional    : input_def.optional,
                 multiple    : input_def.multiple,
+                onchange    : input_def.onchange
+            });
+        },
+
+        /** GenomeSpace file select field
+         */
+        _fieldGenomeSpace: function( input_def ) {
+             var self = this;
+             return new SelectGenomeSpace.View({
+                 id          : 'field-' + input_def.id,
+                 onchange    : function() {
+                     self.app.trigger( 'change' );
+                 }
+             });
+         },
+
+        /** Upload file field */
+        _fieldUpload: function( input_def ) {
+            return new Ui.Upload({
+                id          : 'field-' + input_def.id,
                 onchange    : input_def.onchange
             });
         }
