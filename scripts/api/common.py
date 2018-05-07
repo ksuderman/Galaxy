@@ -46,7 +46,10 @@ def post(api_key, url, data):
     """
     url = make_url(api_key, url)
     req = Request(url, headers={'Content-Type': 'application/json'}, data=json.dumps(data))
+    print('URL: ' + url)
+    print('Data: ' + json.dumps(data))
     return json.loads(urlopen(req).read())
+    #return 'OK'
 
 
 def put(api_key, url, data):
