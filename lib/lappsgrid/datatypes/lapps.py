@@ -269,11 +269,11 @@ class TCF( Lapps ):
         log.info("Found a TCF file.")
         return True
 
-class Xcas(Lapps):
+class Uima(Lapps):
     """
         UIMA XCAS in a JSON wrapper.
     """
-    file_ext = "xcas"
+    file_ext = "uima"
     header = '{"discriminator":"http://vocab.lappsgrid.org/ns/media/xml#uima"'
     blurb = "UIMA/XCAS in a Lapps Container"
 
@@ -285,13 +285,13 @@ class Xcas(Lapps):
         :param filename: The name of the file to be checked.
         :return: True if filename is a GATE file, False otherwise.
         """
-        log.info("XCAS: Sniffing %s", filename)
+        log.info("UIMA: Sniffing %s", filename)
         with open(filename, "r") as fh:
             for c in self.header:
                 if c != self.read(fh):
                     return False
 
-        log.info("Found a GATE file.")
+        log.info("Found a UIMA file.")
         return True
 
 
@@ -299,7 +299,7 @@ class PubAnn(Lapps):
     """
         PubAnnotation JSON format in a Lapps Data object.
     """
-    file_ext = "xcas"
+    file_ext = "pubann"
     header = '{"discriminator":"http://vocab.lappsgrid.org/ns/media/json#pubannotation"'
     blurb = "PubAnnotation JSON in a Lapps Container"
 
@@ -317,5 +317,5 @@ class PubAnn(Lapps):
                 if c != self.read(fh):
                     return False
 
-        log.info("Found a GATE file.")
+        log.info("Found a PubAnnotation file.")
         return True
