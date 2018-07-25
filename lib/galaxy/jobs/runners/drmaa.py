@@ -92,6 +92,7 @@ class DRMAAJobRunner(AsynchronousJobRunner):
 
         self._init_monitor_thread()
         self._init_worker_threads()
+        self.redact_email_in_job_name = self.app.config.redact_email_in_job_name
 
     def url_to_destination(self, url):
         """Convert a legacy URL to a job destination"""
@@ -110,7 +111,7 @@ class DRMAAJobRunner(AsynchronousJobRunner):
         """Get any native DRM arguments specified by the site configuration"""
         try:
             return url.split('/')[2] or None
-        except:
+        except Exception:
             return None
 
     def queue_job(self, job_wrapper):
@@ -151,7 +152,7 @@ class DRMAAJobRunner(AsynchronousJobRunner):
         script = self.get_job_file(job_wrapper, exit_code_path=ajs.exit_code_file)
         try:
             self.write_executable_script(ajs.job_file, script)
-        except:
+        except Exception:
             job_wrapper.fail("failure preparing job script", exception=True)
             log.exception("(%s) failure writing job script" % galaxy_id_tag)
             return
@@ -183,7 +184,7 @@ class DRMAAJobRunner(AsynchronousJobRunner):
                     log.warning('(%s) drmaa.Session.runJob() failed, will retry: %s', galaxy_id_tag, e)
                     fail_msg = "Unable to run this job due to a cluster error, please retry it later"
                     time.sleep(5)
-                except:
+                except Exception:
                     log.exception('(%s) drmaa.Session.runJob() failed unconditionally', galaxy_id_tag)
                     trynum = 5
             else:
@@ -389,7 +390,7 @@ class DRMAAJobRunner(AsynchronousJobRunner):
         job_name = 'g%s' % galaxy_id_tag
         if job_wrapper.tool.old_id:
             job_name += '_%s' % job_wrapper.tool.old_id
-        if external_runjob_script is None:
+        if not self.redact_email_in_job_name and external_runjob_script is None:
             job_name += '_%s' % job_wrapper.user
         job_name = ''.join(x if x in (string.ascii_letters + string.digits + '_') else '_' for x in job_name)
         if self.restrict_job_name_length:
