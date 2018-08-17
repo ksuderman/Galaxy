@@ -269,4 +269,53 @@ class TCF( Lapps ):
         log.info("Found a TCF file.")
         return True
 
+class Uima(Lapps):
+    """
+        UIMA XCAS in a JSON wrapper.
+    """
+    file_ext = "uima"
+    header = '{"discriminator":"http://vocab.lappsgrid.org/ns/media/xml#uima"'
+    blurb = "UIMA/XCAS in a Lapps Container"
 
+    def sniff(self, filename):
+        """
+        Reads the start of the file (ignoring whitespace) looking for the
+        required GATE header.
+
+        :param filename: The name of the file to be checked.
+        :return: True if filename is a GATE file, False otherwise.
+        """
+        log.info("UIMA: Sniffing %s", filename)
+        with open(filename, "r") as fh:
+            for c in self.header:
+                if c != self.read(fh):
+                    return False
+
+        log.info("Found a UIMA file.")
+        return True
+
+
+class PubAnn(Lapps):
+    """
+        PubAnnotation JSON format in a Lapps Data object.
+    """
+    file_ext = "pubann"
+    header = '{"discriminator":"http://vocab.lappsgrid.org/ns/media/json#pubannotation"'
+    blurb = "PubAnnotation JSON in a Lapps Container"
+
+    def sniff(self, filename):
+        """
+        Reads the start of the file (ignoring whitespace) looking for the
+        required GATE header.
+
+        :param filename: The name of the file to be checked.
+        :return: True if filename is a GATE file, False otherwise.
+        """
+        log.info("PubAnn: Sniffing %s", filename)
+        with open(filename, "r") as fh:
+            for c in self.header:
+                if c != self.read(fh):
+                    return False
+
+        log.info("Found a PubAnnotation file.")
+        return True
