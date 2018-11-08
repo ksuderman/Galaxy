@@ -1,0 +1,29 @@
+﻿id: paste_text
+name: Paste Text
+description: Paste a short text directly into Galaxy.
+title_default: LAPPS: Paste Text
+steps:
+  - title: Step 1
+    element: '#btn-new'
+    content: WTF is btn-new?
+    placement: left
+  - title: Step 2
+    element: >-
+      #upload-row-0 td .upload-text-column .upload-text
+      .upload-text-content.form-control
+    content: Select Upload File. When do we paste the text?
+    placement: right
+  - title: Step 3
+    element: '#btn-start'
+    content: Start the upload
+    placement: left
+  - title: Step 4
+    element: '#btn-close'
+    content: Close the dialog when finished.
+    placement: left
+  - title: Step 5
+    element: >-
+      #dataset-a798d458a7de09ac .primary-actions
+      a[href$="/datasets/a798d458a7de09ac/display/?preview=True"] .fa.fa-eye
+    content: Select the eye-ball icon to view the data.
+    placement: left
