@@ -3,6 +3,7 @@
 String lappsjson = new File(args[0]).text
 
 if (!lappsjson.trim().startsWith("{")) {
+    //println "bailing early"
     println lappsjson
     return
 }
@@ -146,6 +147,7 @@ String password = ""
 
 String url = "http://eldrad.cs-i.brandeis.edu:8282/json2json/0.3.3/services/Json2JsonWS?wsdl"
 ServiceClient client = new ServiceClient(url, username, password)
-String json = client.execute(builder.toString())
-new File('/tmp/builder.json').text = json
+String json = builder.toString()
+json = client.execute(json)
+//new File('builder.json').text = json
 println json
