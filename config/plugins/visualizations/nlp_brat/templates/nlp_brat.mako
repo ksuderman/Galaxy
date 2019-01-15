@@ -29,73 +29,74 @@ root = h.url_for( '/' )
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>${hda.name} | ${visualization_name}</title>
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/style-vis.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/bootstrap-theme.min.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/bootstrap.min.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/theme.css' )}
 
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/codemirror/codemirror.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/codemirror/simplescrollbars.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/codemirror/fullscreen.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/codemirror/dialog.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/codemirror/matchesonscrollbar.css' )}
-    ${h.stylesheet_link( root + 'plugins/visualizations/nlp_brat/static/css/codemirror/foldgutter.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/style-vis.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/bootstrap-theme.min.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/bootstrap.min.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/theme.css' )}
+
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/codemirror/codemirror.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/codemirror/simplescrollbars.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/codemirror/fullscreen.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/codemirror/dialog.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/codemirror/matchesonscrollbar.css' )}
+    ${h.stylesheet_link( root + 'static/plugins/visualizations/nlp_brat/static/css/codemirror/foldgutter.css' )}
 
 
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/codemirror.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/simplescrollbars.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/markdown.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/xml.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/placeholder.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/fullscreen.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/javascript.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/active-line.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/matchbrackets.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/overlay.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/loadmode.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/meta.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/htmlmixed.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/dialog.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/searchcursor.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/search.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/annotatescrollbar.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/foldcode.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/foldgutter.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/brace-fold.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/xml-fold.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/markdown-fold.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/comment-fold.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/matchesonscrollbar.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/codemirror/typo.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/codemirror.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/simplescrollbars.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/markdown.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/xml.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/placeholder.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/fullscreen.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/javascript.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/active-line.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/matchbrackets.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/overlay.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/loadmode.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/meta.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/htmlmixed.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/dialog.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/searchcursor.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/search.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/annotatescrollbar.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/foldcode.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/foldgutter.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/brace-fold.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/xml-fold.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/markdown-fold.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/comment-fold.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/matchesonscrollbar.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/codemirror/typo.js' )}
 
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/jquery_1.11.3_jquery-1.11.3.min.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/head.load.min.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/bootstrap.min.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/lisp2dot.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/xslt.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/viz.js' )}
-    ${h.javascript_link( root + 'plugins/visualizations/nlp_brat/static/js/clearnlp_demo.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/jquery_1.11.3_jquery-1.11.3.min.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/head.load.min.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/bootstrap.min.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/lisp2dot.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/xslt.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/viz.js' )}
+    ${h.javascript_link( root + 'static/plugins/visualizations/nlp_brat/static/js/clearnlp_demo.js' )}
 
     <script>
         head.js(
-            '${root}plugins/visualizations/nlp_brat/static/js/jquery.min.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/jquery.svg.min.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/jquery.svgdom.min.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/jquery-ui.min.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/webfont.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/util.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/annotation_log.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/dispatcher.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/url_monitor.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/visualizer.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/configuration.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/lisp2dot.js',
-            '${root}plugins/visualizations/nlp_brat/static/js/viz.js'
+            '${root}static/plugins/visualizations/nlp_brat/static/js/jquery.min.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/jquery.svg.min.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/jquery.svgdom.min.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/jquery-ui.min.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/webfont.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/util.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/annotation_log.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/dispatcher.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/url_monitor.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/visualizer.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/configuration.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/lisp2dot.js',
+            '${root}static/plugins/visualizations/nlp_brat/static/js/viz.js'
         );
         var webFontURLs = [
-            '${root}plugins/visualizations/nlp_brat/static/fonts/Astloch-Bold.ttf',
-            '${root}plugins/visualizations/nlp_brat/static/fonts/PT_Sans-Caption-Web-Regular.ttf',
-            '${root}plugins/visualizations/nlp_brat/static/fonts/Liberation_Sans-Regular.ttf'
+            '${root}static/plugins/visualizations/nlp_brat/static/fonts/Astloch-Bold.ttf',
+            '${root}static/plugins/visualizations/nlp_brat/static/fonts/PT_Sans-Caption-Web-Regular.ttf',
+            '${root}static/plugins/visualizations/nlp_brat/static/fonts/Liberation_Sans-Regular.ttf'
         ];
 
         var getTextAreaValue = function (textareaId) {
@@ -303,7 +304,7 @@ root = h.url_for( '/' )
     <table align="center" class="table table-bordered table-striped responsive-utilities" align="center" style="width:800px;">
         <tr><th> Display </th></tr>
         <tr><td height="100px"><div id="preload" style="width:100px;height:100px;position:fixed;top:50%;left:50%;" ondblclick="$('#preload').hide();">
-            <img src="${root}plugins/visualizations/nlp_brat/static/img/KUJoe.gif" /></div>
+            <img src="${root}static/plugins/visualizations/nlp_brat/static/img/KUJoe.gif" /></div>
             <div id="instantbratdisplay"></div></td></tr>
         <tr><td><div id="instantdotdisplay" style="display:none">Loading ...</div></td></tr>
     </table>
@@ -332,7 +333,14 @@ root = h.url_for( '/' )
 
 <footer>
     <hr />
-    <p style="text-align:center">Copyright &copy; 2017 The Language Applications Grid - All Rights Reserved</p>
+    <!--
+    <p style="text-align:center">
+        Contacts:
+        <br/>&nbsp; &nbsp; <a target="_blank" class="nolink" href="http://www.cs.brandeis.edu/~jamesp/"> James Pustejovsky</a>
+        (<nonsense>jame</nonsense>sp@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu)
+    </p>
+    -->
 </footer>
+<p style="text-align:center">Copyright &copy; 2019 The Language Applications Grid - All Rights Reserved</p>
 </body>
 </html>
