@@ -1,7 +1,6 @@
 import os, json
 from brat_types import entity_types
 
-
 class Uri:
     BASE = "http://vocab.lappsgrid.org"
     TOKEN = BASE + "/Token"
@@ -15,10 +14,8 @@ class Uri:
     MARKABLE = BASE + "/Markable"
     RELATION = BASE + "/GenericRelation"
 
-
 class ColorPicker:
-    colors = ["#7fa2ff", "#8fb2ff", "#95dfff", "#a4bced", "#adf6a2", "#ccadf6", "#ccdaf6", "#e3e3e3", "#e4cbf6",
-              "#f1f447", "#ffccaa", "#ffe000", "#ffe8be", "#fffda8", "lightblue", "lightgray", "lightgreen"]
+    colors = [ "#7fa2ff", "#8fb2ff", "#95dfff", "#a4bced", "#adf6a2", "#ccadf6", "#ccdaf6", "#e3e3e3", "#e4cbf6", "#f1f447", "#ffccaa", "#ffe000", "#ffe8be", "#fffda8", "lightblue", "lightgray", "lightgreen" ]
 
     def __init__(self):
         self.index = 0
@@ -30,42 +27,40 @@ class ColorPicker:
         self.index = self.index + 1
         return color
 
-
 color_picker = ColorPicker()
 
-relation_types = [{
-    "args": [{
-        "role": "Arg1",
-        "targets": ["Mention"]
+relation_types = [ {
+    "args" : [ {
+        "role" : "Arg1",
+        "targets" : [ "Mention" ]
     }, {
-        "role": "Arg2",
-        "targets": ["Mention"]
-    }],
-    "arrowHead": "none",
-    "name": "Coref",
-    "labels": ["Coreference", "Coref"],
-    "children": [],
-    "unused": False,
-    "dashArray": "3,3",
-    "attributes": [],
-    "type": "Coreference",
-    "properties": {
-        "symmetric": True,
-        "transitive": True
+        "role" : "Arg2",
+        "targets" : [ "Mention" ]
+    } ],
+    "arrowHead" : "none",
+    "name" : "Coref",
+    "labels" : [ "Coreference", "Coref" ],
+    "children" : [ ],
+    "unused" : False,
+    "dashArray" : "3,3",
+    "attributes" : [ ],
+    "type" : "Coreference",
+    "properties" : {
+        "symmetric" : True,
+        "transitive" : True
     }
-}]
+} ]
+
 
 relation_types_index = dict()
 relation_types_index['Coreference'] = relation_types[0]
 
 log = list()
 
-
 def load_entity_types():
     base_path = os.getcwd() + '../mods/plugins/visualizations/brat/lib/brat_types.py'
     with open(base_path) as src:
         return json.load(src)
-
 
 # def next_color():
 #     if color_index >= len(colors):
@@ -80,42 +75,39 @@ def register_dependency_type(type_name):
 
     type = {
         'type': type_name,
-        'labels': [type_name],
+        'labels': [ type_name ],
         'bgColor': color_picker.next(),
         'args': [
-            {'role': 'Governor', 'targets': ['Entity']},
-            {'role': 'Dependent', 'targets': ['Entity']}
+            {'role': 'Governor', 'targets':['Entity']},
+            {'role': 'Dependent', 'targets':['Entity']}
         ]
     }
     relation_types.append(type)
     relation_types_index[type_name] = type
-
 
 def register_structure_type(type_name):
     if type_name in relation_types_index:
         return
     type = {
         'type': type_name,
-        'labels': [type_name],
+        'labels': [ type_name ],
         'bgColor': color_picker.next(),
         'args': [
-            {'role': 'Parent', 'targets': ['Relation']},
-            {'role': 'Child', 'targets': ['Relation', 'Entity']}
+            {'role': 'Parent', 'targets':['Relation']},
+            {'role': 'Child', 'targets':['Relation', 'Entity']}
         ]
     }
     relation_types.append(type)
     relation_types_index[type_name] = type
 
-
 def createEntity(annotation):
     entity = list()
     entity.append(annotation['id'])
     entity.append(getLabel(annotation))
-    offsets = [[annotation['start'], annotation['end']]]
+    offsets = [[ annotation['start'], annotation['end'] ]]
     entity.append(offsets)
     log.append(str(entity))
     return entity
-
 
 # def createRelation(annotation):
 #     type = annotation['@type']
@@ -146,11 +138,11 @@ def processPhraseStructure(annotations):
     relations = list()
     root = {
         'type': 'ROOT',
-        'labels': ['ROOT'],
+        'labels': [ 'ROOT'],
         'bgColor': color_picker.next(),
         'args': [
             {'role': 'Child', 'targets': ['Relation', 'Entity']},
-            {'role': 'Parent', 'targets': ['Relation']}
+            {'role': 'Parent', 'targets': ['Relation'] }
         ]
     }
     relation_types.append(root)
@@ -175,7 +167,6 @@ def processPhraseStructure(annotations):
             relations.append(relation)
     return relations
 
-
 def createDependency(annotation):
     features = annotation['features']
     if 'governor_word' not in features:
@@ -186,7 +177,7 @@ def createDependency(annotation):
     relation = list()
     relation.append(annotation['id'])
     relation.append(type)
-    relation.append([['Governor', features['governor']], ['Dependent', features['dependent']]])
+    relation.append([ ['Governor', features['governor']], [ 'Dependent', features['dependent']] ])
     return relation
 
 
@@ -194,7 +185,7 @@ def getLabel(annotation):
     type = annotation['@type']
     if type == Uri.NE:
         return annotation['features']['category']
-    if type == Uri.TOKEN or type == Uri.POS:
+    if is_token(type):
         return annotation['features']['pos']
     if type == Uri.MARKABLE:
         if annotation['label'] != None:
@@ -205,7 +196,6 @@ def getLabel(annotation):
     if annotation['label'] != None:
         return annotation['label']
     return 'Entity'
-
 
 def processDependencies(annotations):
     # names = list()
@@ -220,11 +210,10 @@ def processDependencies(annotations):
                 relations.append(relation)
     return relations
 
-
 def make_args(arr):
     if type(arr) == str:
         arr = arr[1:-1].split(",")
-    return [['Parent', arr[0]], ['Child', arr[1]]]
+    return [ ['Parent', arr[0]], ['Child', arr[1]]]
 
 
 def processGenericRelations(annotations):
@@ -235,7 +224,7 @@ def processGenericRelations(annotations):
                 type = a['features']['label']
             else:
                 type = 'Rel'
-            # type = a['features']['label']
+            #type = a['features']['label']
             register_structure_type(type)
             relation = [
                 a['id'],
@@ -245,11 +234,12 @@ def processGenericRelations(annotations):
             relations.append(relation)
     return relations
 
+def is_token(type):
+    return type in [Uri.TOKEN, Uri.POS, 'Token', 'Token#pos']
 
 def is_viewable(a):
     type = a['@type']
-    return type in [Uri.TOKEN, Uri.POS, Uri.NE, Uri.MARKABLE, 'Tagger']
-
+    return is_token(type) or type in [ Uri.NE, Uri.MARKABLE, 'Tagger' ]
 
 def brat(lappsJson):
     docData = {}
@@ -259,8 +249,7 @@ def brat(lappsJson):
     annotations = view['annotations']
     docData['text'] = container['text']['@value']
     # object['entities'] = [ createEntity(a, list) for a in annotations ]
-    # entities = [createEntity(a) for a in annotations if is_viewable(a)]
-    entities = [createEntity(a) for a in annotations]
+    entities = [createEntity(a) for a in annotations if is_viewable(a)]
     # ne = [ createEntity(a) for a in annotations if a['@type'] == Uri.NE ]
     # markables = [ createEntity(a) for a in annotations if a['@type'] == Uri.MARKABLE ]
     docData['entities'] = entities
@@ -274,13 +263,12 @@ def brat(lappsJson):
     collData = dict()
     collData['entity_types'] = entity_types
     collData['relation_types'] = relation_types
-
+    
     return {
         'annotations': json.dumps(docData),
         'config': json.dumps(collData),
         'log': json.dumps(log)
     }
-
 
 if __name__ == '__main__':
     # with open('/Users/suderman/Workspaces/IntelliJ/Services/brat/src/test/resources/stanford-dep.lif') as json_file:
