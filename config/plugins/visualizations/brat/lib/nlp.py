@@ -106,7 +106,6 @@ def createEntity(annotation):
     entity.append(getLabel(annotation))
     offsets = [[ annotation['start'], annotation['end'] ]]
     entity.append(offsets)
-    log.append(str(entity))
     return entity
 
 # def createRelation(annotation):
@@ -267,7 +266,6 @@ def brat(lappsJson):
     return {
         'annotations': json.dumps(docData),
         'config': json.dumps(collData),
-        'log': json.dumps(log)
     }
 
 if __name__ == '__main__':
