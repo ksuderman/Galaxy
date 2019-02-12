@@ -201,6 +201,7 @@ class Registry(object):
                     if can_process_datatype:
                         if dtype is not None:
                             try:
+                                self.log.debug('dtype is %s', str(dtype))
                                 fields = dtype.split(':')
                                 datatype_module = fields[0]
                                 datatype_class_name = fields[1]

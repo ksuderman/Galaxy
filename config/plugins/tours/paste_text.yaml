@@ -1,7 +1,7 @@
 ﻿id: paste_text
 name: Paste Text
 description: Paste a short text directly into Galaxy.
-title_default: LAPPS: Paste Text
+title_default: Paste Text
 steps:
   - title: Step 1
     element: '#btn-new'
