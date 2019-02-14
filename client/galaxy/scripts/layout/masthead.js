@@ -80,8 +80,8 @@ var View = Backbone.View.extend({
     },
 
     render: function() {
-        // this.$navbarBrandTitle.html(`Galaxy ${(this.options.brand && `/ ${this.options.brand}`) || ""}`);
-        this.$navbarBrandTitle.html(`${(this.options.brand && `${this.options.brand} /`) || " "} Galaxy`);
+        /* this.$navbarBrandTitle.html(`Galaxy ${(this.options.brand && `/ ${this.options.brand}`) || ""}`); */
+        this.$navbarBrandTitle.html("LAPPS / Galaxy");
         this.$navbarBrandLink.attr("href", this.options.logo_url);
         this.$navbarBrandImage.attr("src", this.options.logo_src);
         this.quotaMeter.render();
@@ -97,7 +97,7 @@ var View = Backbone.View.extend({
     /** body template */
     _template: function() {
         return `
-            <nav id="masthead" class="navbar navbar-expand fixed-top justify-content-center navbar-dark">
+            <nav id="masthead" class="navbar navbar-expand justify-content-center navbar-dark">
                 <a class="navbar-brand">
                     <img class="navbar-brand-image"/>
                     <span class="navbar-brand-title"/>
