@@ -294,7 +294,7 @@ root = h.url_for( '/' )
 <body>
 <!--h2  align="center">Online Visualization of LappsGrid</h2>
 <p style="text-align:center;font-size: 12pt;"-->
-    LappsGrid, <var>Version 0.4.1</var>,  May 2019</p>
+    LappsGrid, <var>Version 0.4.1</var>,  February 2019</p>
 
     <textarea style="display:none" id="docjson">${data['annotations']}</textarea>
     <textarea style="display:none" id="colljson">${data['config']}</textarea>

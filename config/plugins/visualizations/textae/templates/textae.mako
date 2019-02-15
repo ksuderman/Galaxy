@@ -4,16 +4,16 @@
     import os
     root = h.url_for( '/' )
     json = hda.get_raw_data()
+    path = hda.get_file_name()
 %>
 
 <html>
-<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>${hda.name} | ${visualization_name}</title>
-    ${h.stylesheet_link('http://textae.pubannotation.org/lib/css/textae.min.css')}
-    ${h.javascript_link('http://textae.pubannotation.org/lib/textae.min.js')}
+    <link href="http://textae.pubannotation.org/lib/css/textae.min.css" rel="stylesheet"></link>
+    <script src="http://textae.pubannotation.org/lib/textae.min.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -25,6 +25,8 @@
             $('#hide').on('click', function (e) {
                 $('#output_div').hide()
             })
+            $("#textae").text('{ "text":"Hello world." }');
+            console.log("Set textae content.")
         })
     </script>
 </head>
@@ -39,35 +41,31 @@
             <td>${hda.name}</td>
         </tr>
         <tr>
-            <th>Type</th>
-            <td>${hda.datatype}</td>
+            <th>Path</th>
+            <td>${hda.get_file_name()}</td>
         </tr>
         <tr>
             <th>Dataset</th>
             <td>${hda.dataset}</td>
         </tr>
     </table>
+    <!--
+    <div id="textae" class="textae-editor">
+        { "text": "Hello World", "denotations": [ {"id":"t1","obj:"UH", ["begin":0,"end":5]}, {"id":"t2","obj":"NN",["begin":6,"end":11]}] }
+    </div>
     <div id="textae" class="textae-editor" mode="edit">${json}</div>
-    <button id="save">Save</button>
+    -->
+    <p>Loading data from ${path}</p>
+    <div id="textae" class="textae-editor" mode="edit" target="${path}">
 
+    </div>
+    <button id="save">Save</button>
     <div id="output_div" style="display: none">
         <p id="output">Yay! I'm visible.</p>
         <button id="hide">Hide</button>
     </div>
-<!--
-    <textarea>${hda}</textarea>
-    <textarea>${hda.datatype}</textarea>
-    <textarea>${hda.get_raw_data()}</textarea>
-    <textarea>${hda.name}</textarea>
-    <textarea>${hda.dataset}</textarea>
-    <textarea>${hda.dataset.file_name}</textarea>
-    <textarea>${hda.dataset.object_store}</textarea>
-    <textarea>${hda.dataset.object_store.config}</textarea>
-    <textarea>${os.getcwd()}</textarea>
--->
-
 <footer>
-    <p style="text-align:center">Copyright &copy; 2018 The Language Applications Grid - All Rights Reserved</p>
+    <p style="text-align:center">Copyright &copy; 2019 The Language Applications Grid - All Rights Reserved</p>
 </footer>
 </body>
 </html>
