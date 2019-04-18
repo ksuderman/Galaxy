@@ -12,8 +12,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>${hda.name} | ${visualization_name}</title>
-    <link href="http://textae.pubannotation.org/lib/css/textae.min.css" rel="stylesheet"></link>
-    <script src="http://textae.pubannotation.org/lib/textae.min.js"></script>
+    <link href="https://textae.pubannotation.org/lib/css/textae.min.css" rel="stylesheet"></link>
+    <script src="https://textae.pubannotation.org/lib/textae.min.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -25,8 +25,6 @@
             $('#hide').on('click', function (e) {
                 $('#output_div').hide()
             })
-            $("#textae").text('{ "text":"Hello world." }');
-            console.log("Set textae content.")
         })
     </script>
 </head>
@@ -56,9 +54,7 @@
     <div id="textae" class="textae-editor" mode="edit">${json}</div>
     -->
     <p>Loading data from ${path}</p>
-    <div id="textae" class="textae-editor" mode="edit" target="${path}">
-
-    </div>
+    <div id="textae" class="textae-editor" mode="edit" target="${path}">${json}</div>
     <button id="save">Save</button>
     <div id="output_div" style="display: none">
         <p id="output">Yay! I'm visible.</p>
