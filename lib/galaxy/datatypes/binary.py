@@ -23,7 +23,7 @@ from bx.seq.twobit import TWOBIT_MAGIC_NUMBER, TWOBIT_MAGIC_NUMBER_SWAP, TWOBIT_
 from galaxy import util
 from galaxy.datatypes import metadata
 from galaxy.datatypes.metadata import DictParameter, ListParameter, MetadataElement, MetadataParameter
-from galaxy.util import FILENAME_VALID_CHARS, nice_size, sqlite
+from galaxy.util import nice_size, sqlite
 from galaxy.util.checkers import is_bz2, is_gzip
 from . import data, dataproviders
 
@@ -58,16 +58,6 @@ class Binary(data.Data):
     def get_mime(self):
         """Returns the mime type of the datatype"""
         return 'application/octet-stream'
-
-    def display_data(self, trans, dataset, preview=False, filename=None, to_ext=None, **kwd):
-        trans.response.set_content_type(dataset.get_mime())
-        trans.log_event("Display dataset id: %s" % str(dataset.id))
-        trans.response.headers['Content-Length'] = int(os.stat(dataset.file_name).st_size)
-        to_ext = dataset.extension
-        fname = ''.join(c in FILENAME_VALID_CHARS and c or '_' for c in dataset.name)[0:150]
-        trans.response.set_content_type("application/octet-stream")  # force octet-stream so Safari doesn't append mime extensions to filename
-        trans.response.headers["Content-Disposition"] = 'attachment; filename="Galaxy%s-[%s].%s"' % (dataset.hid, fname, to_ext)
-        return open(dataset.file_name, mode='rb')
 
 
 class Ab1(Binary):
@@ -119,7 +109,7 @@ class Cel(Binary):
         Try to guess if the file is a CEL file.
 
         >>> from galaxy.datatypes.sniff import get_test_fname
-        >>> fname = get_test_fname('test.CEL')
+        >>> fname = get_test_fname('test.cel')
         >>> Cel().sniff(fname)
         True
 
@@ -134,6 +124,18 @@ class Cel(Binary):
             return False
         except Exception:
             return False
+
+
+class MashSketch(Binary):
+    """
+        Mash Sketch file.
+        Sketches are used by the MinHash algorithm to allow fast distance estimations
+        with low storage and memory requirements. To make a sketch, each k-mer in a sequence
+        is hashed, which creates a pseudo-random identifier. By sorting these identifiers (hashes),
+        a small subset from the top of the sorted list can represent the entire sequence (these are min-hashes).
+        The more similar another sequence is, the more min-hashes it is likely to share.
+    """
+    file_ext = "msh"
 
 
 class CompressedArchive(Binary):
@@ -223,7 +225,6 @@ class BamNative(CompressedArchive):
     file_ext = "unsorted.bam"
     sort_flag = None
 
-    MetadataElement(name="bam_index", desc="BAM Index File", param=metadata.FileParameter, file_ext="bai", readonly=True, no_value=None, visible=False, optional=True)
     MetadataElement(name="bam_version", default=None, desc="BAM Version", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=None)
     MetadataElement(name="sort_order", default=None, desc="Sort Order", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=None)
     MetadataElement(name="read_groups", default=[], desc="Read Groups", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=[])
@@ -397,6 +398,8 @@ class Bam(BamNative):
     track_type = "ReadTrack"
     data_sources = {"data": "bai", "index": "bigwig"}
 
+    MetadataElement(name="bam_index", desc="BAM Index File", param=metadata.FileParameter, file_ext="bai", readonly=True, no_value=None, visible=False, optional=True)
+
     def dataset_content_needs_grooming(self, file_name):
         """
         Check if file_name is a coordinate-sorted BAM file
@@ -556,7 +559,7 @@ class BamQuerynameSorted(BamInputSorted):
     file_ext = "qname_sorted.bam"
 
     def sniff(self, file_name):
-        return super(BamQuerynameSorted, self).sniff(file_name) and not self.dataset_content_needs_grooming(file_name)
+        return BamNative().sniff(file_name) and not self.dataset_content_needs_grooming(file_name)
 
     def dataset_content_needs_grooming(self, file_name):
         """
@@ -657,7 +660,8 @@ class Bcf(BaseBcf):
                                        '__dataset_%d_%s' % (dataset.id, os.path.basename(index_file.file_name)))
         os.symlink(dataset.file_name, dataset_symlink)
         try:
-            pysam.bcftools.index(dataset_symlink)
+            cmd = ['python', '-c', "import pysam.bcftools; pysam.bcftools.index('%s')" % (dataset_symlink)]
+            subprocess.check_call(cmd)
             shutil.move(dataset_symlink + '.csi', index_file.file_name)
         except Exception as e:
             raise Exception('Error setting BCF metadata: %s' % (str(e)))
@@ -667,7 +671,7 @@ class Bcf(BaseBcf):
         dataset.metadata.bcf_index = index_file
 
 
-class BcfUncompressed(Bcf):
+class BcfUncompressed(BaseBcf):
     """
     Class describing an uncompressed BCF file
 
@@ -931,7 +935,7 @@ class Biom2(H5):
     def sniff(self, filename):
         """
         >>> from galaxy.datatypes.sniff import get_test_fname
-        >>> fname = get_test_fname('biom2_sparse_otu_table_hdf5.biom')
+        >>> fname = get_test_fname('biom2_sparse_otu_table_hdf5.biom2')
         >>> Biom2().sniff(fname)
         True
         >>> fname = get_test_fname('test.mz5')
@@ -1013,7 +1017,7 @@ class Cool(H5):
         >>> fname = get_test_fname('wiggle.wig')
         >>> Cool().sniff(fname)
         False
-        >>> fname = get_test_fname('biom2_sparse_otu_table_hdf5.biom')
+        >>> fname = get_test_fname('biom2_sparse_otu_table_hdf5.biom2')
         >>> Cool().sniff(fname)
         False
         """
@@ -1472,7 +1476,7 @@ class IdpDB(SQlite):
     Class describing an IDPicker 3 idpDB (sqlite) database
 
     >>> from galaxy.datatypes.sniff import get_test_fname
-    >>> fname = get_test_fname('test.idpDB')
+    >>> fname = get_test_fname('test.idpdb')
     >>> IdpDB().sniff(fname)
     True
     >>> fname = get_test_fname('interval.interval')
@@ -1518,8 +1522,8 @@ class IdpDB(SQlite):
 
 class GAFASQLite(SQlite):
     """Class describing a GAFA SQLite database"""
-    MetadataElement(name='gafa_schema_version', default='0.1.0', param=MetadataParameter, desc='GAFA schema version',
-                    readonly=True, visible=True, no_value='0.1.0')
+    MetadataElement(name='gafa_schema_version', default='0.3.0', param=MetadataParameter, desc='GAFA schema version',
+                    readonly=True, visible=True, no_value='0.3.0')
     file_ext = 'gafa.sqlite'
 
     def set_meta(self, dataset, overwrite=True, **kwd):
@@ -2166,6 +2170,29 @@ class DAA(Binary):
             return f.read(8) == self._magic
 
 
+class RMA6(Binary):
+    """
+    Class describing an RMA6 (MEGAN6 read-match archive) file
+    >>> from galaxy.datatypes.sniff import get_test_fname
+    >>> fname = get_test_fname('diamond.rma6')
+    >>> RMA6().sniff(fname)
+    True
+    >>> fname = get_test_fname('interval.interval')
+    >>> RMA6().sniff(fname)
+    False
+    """
+    file_ext = "rma6"
+
+    def __init__(self, **kwd):
+        Binary.__init__(self, **kwd)
+        self._magic = binascii.unhexlify("000003f600000006")
+
+    def sniff(self, filename):
+        # The first 8 bytes of any daa file are 0x3c0e53476d3ee36b
+        with open(filename, 'rb') as f:
+            return f.read(8) == self._magic
+
+
 class DMND(Binary):
     """
     Class describing an DMND file
@@ -2210,6 +2237,118 @@ class ICM(Binary):
             return True
 
         return False
+
+
+class BafTar(CompressedArchive):
+    """
+    Base class for common behavior of tar files of directory-based raw file formats
+    >>> from galaxy.datatypes.sniff import get_test_fname
+    >>> fname = get_test_fname('brukerbaf.d.tar')
+    >>> BafTar().sniff(fname)
+    True
+    >>> fname = get_test_fname('test.fast5.tar')
+    >>> BafTar().sniff(fname)
+    False
+    """
+    edam_data = "data_2536"  # mass spectrometry data
+    edam_format = "format_3712"  # TODO: add more raw formats to EDAM?
+    file_ext = "brukerbaf.d.tar"
+
+    def get_signature_file(self):
+        return "analysis.baf"
+
+    def sniff(self, filename):
+        if tarfile.is_tarfile(filename):
+            with tarfile.open(filename) as rawtar:
+                return self.get_signature_file() in [os.path.basename(f).lower() for f in rawtar.getnames()]
+        return False
+
+    def get_type(self):
+        return "Bruker BAF directory archive"
+
+    def set_peek(self, dataset, is_multi_byte=False):
+        if not dataset.dataset.purged:
+            dataset.peek = self.get_type()
+            dataset.blurb = nice_size(dataset.get_size())
+        else:
+            dataset.peek = 'file does not exist'
+            dataset.blurb = 'file purged from disk'
+
+    def display_peek(self, dataset):
+        try:
+            return dataset.peek
+        except Exception:
+            return "%s (%s)" % (self.get_type(), nice_size(dataset.get_size()))
+
+
+class YepTar(BafTar):
+    """ A tar'd up .d directory containing Agilent/Bruker YEP format data """
+    file_ext = "agilentbrukeryep.d.tar"
+
+    def get_signature_file(self):
+        return "analysis.yep"
+
+    def get_type(self):
+        return "Agilent/Bruker YEP directory archive"
+
+
+class TdfTar(BafTar):
+    """ A tar'd up .d directory containing Bruker TDF format data """
+    file_ext = "brukertdf.d.tar"
+
+    def get_signature_file(self):
+        return "analysis.tdf"
+
+    def get_type(self):
+        return "Bruker TDF directory archive"
+
+
+class MassHunterTar(BafTar):
+    """ A tar'd up .d directory containing Agilent MassHunter format data """
+    file_ext = "agilentmasshunter.d.tar"
+
+    def get_signature_file(self):
+        return "msscan.bin"
+
+    def get_type(self):
+        return "Agilent MassHunter directory archive"
+
+
+class MassLynxTar(BafTar):
+    """ A tar'd up .d directory containing Waters MassLynx format data """
+    file_ext = "watersmasslynx.raw.tar"
+
+    def get_signature_file(self):
+        return "_func001.dat"
+
+    def get_type(self):
+        return "Waters MassLynx RAW directory archive"
+
+
+class WiffTar(BafTar):
+    """
+    A tar'd up .wiff/.scan pair containing Sciex WIFF format data
+    >>> from galaxy.datatypes.sniff import get_test_fname
+    >>> fname = get_test_fname('some.wiff.tar')
+    >>> WiffTar().sniff(fname)
+    True
+    >>> fname = get_test_fname('brukerbaf.d.tar')
+    >>> WiffTar().sniff(fname)
+    False
+    >>> fname = get_test_fname('test.fast5.tar')
+    >>> WiffTar().sniff(fname)
+    False
+    """
+    file_ext = "wiff.tar"
+
+    def sniff(self, filename):
+        if tarfile.is_tarfile(filename):
+            with tarfile.open(filename) as rawtar:
+                return ".wiff" in [os.path.splitext(os.path.basename(f).lower())[1] for f in rawtar.getnames()]
+        return False
+
+    def get_type(self):
+        return "Sciex WIFF/SCAN archive"
 
 
 if __name__ == '__main__':

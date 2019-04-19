@@ -120,7 +120,7 @@ class SelectToolParameterWrapper(ToolParameterValueWrapper):
     attributes are accessible.
     """
 
-    class SelectToolParameterFieldWrapper:
+    class SelectToolParameterFieldWrapper(object):
         """
         Provide access to any field by name or index for this particular value.
         Only applicable for dynamic_options selects, which have more than simple 'options' defined (name, value, selected).
@@ -182,7 +182,7 @@ class DatasetFilenameWrapper(ToolParameterValueWrapper):
     attributes are accessible.
     """
 
-    class MetadataWrapper:
+    class MetadataWrapper(object):
         """
         Wraps a Metadata Collection to return MetadataParameters wrapped
         according to the metadata spec. Methods implemented to match behavior
@@ -443,6 +443,10 @@ class DatasetCollectionWrapper(ToolParameterValueWrapper, HasDatasets):
     @property
     def is_collection(self):
         return True
+
+    @property
+    def element_identifier(self):
+        return self.name
 
     @property
     def is_input_supplied(self):
