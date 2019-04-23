@@ -182,9 +182,9 @@ def createDependency(annotation):
 
 def getLabel(annotation):
     type = annotation['@type']
-    if type == Uri.NE:
+    if type == Uri.NE and annotation['features'] != None:
         return annotation['features']['category']
-    if is_token(type):
+    if is_token(type) and annotation['features'] != None:
         return annotation['features']['pos']
     if type == Uri.MARKABLE:
         if annotation['label'] != None:
