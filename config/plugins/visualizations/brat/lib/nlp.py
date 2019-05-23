@@ -13,6 +13,7 @@ class Uri:
     DEPENDENCY = BASE + "/Dependency"
     MARKABLE = BASE + "/Markable"
     RELATION = BASE + "/GenericRelation"
+    SEMANTIC_TAG = BASE + "/SemanticTag"
 
 class ColorPicker:
     colors = [ "#7fa2ff", "#8fb2ff", "#95dfff", "#a4bced", "#adf6a2", "#ccadf6", "#ccdaf6", "#e3e3e3", "#e4cbf6", "#f1f447", "#ffccaa", "#ffe000", "#ffe8be", "#fffda8", "lightblue", "lightgray", "lightgreen" ]
@@ -51,16 +52,16 @@ relation_types = [ {
     }
 } ]
 
-
+entity_types_index = dict()
 relation_types_index = dict()
 relation_types_index['Coreference'] = relation_types[0]
 
 log = list()
 
-def load_entity_types():
-    base_path = os.getcwd() + '../mods/plugins/visualizations/brat/lib/brat_types.py'
-    with open(base_path) as src:
-        return json.load(src)
+# def load_entity_types():
+#     base_path = os.getcwd() + '../mods/plugins/visualizations/brat/lib/brat_types.py'
+#     with open(base_path) as src:
+#         return json.load(src)
 
 # def next_color():
 #     if color_index >= len(colors):
@@ -103,9 +104,23 @@ def register_structure_type(type_name):
 def createEntity(annotation):
     entity = list()
     entity.append(annotation['id'])
-    entity.append(getLabel(annotation))
+    label = getLabel(annotation)
+    entity.append(label)
     offsets = [[ annotation['start'], annotation['end'] ]]
     entity.append(offsets)
+    # make sure we have a type for this entity
+    # type = entity_types_index[label]
+    # if type == None:
+    if not label in entity_types_index:
+        type = {
+            'type': label,
+            'labels': [ label ],
+            'bgColor': color_picker.next(),
+            'borderColor': 'darken'
+        }
+        entity_types.append(type)
+        entity_types_index[label] = type
+
     return entity
 
 # def createRelation(annotation):
@@ -192,6 +207,8 @@ def getLabel(annotation):
         return 'Markable'
     if type == 'Tagger' and 'type' in annotation['features']:
         return annotation['features']['type']
+    if type == Uri.SEMANTIC_TAG and 'tags' in annotation['features']:
+        return annotation['features']['tags'][0]['id']
     if annotation['label'] != None:
         return annotation['label']
     return 'Entity'
@@ -238,7 +255,13 @@ def is_token(type):
 
 def is_viewable(a):
     type = a['@type']
-    return is_token(type) or type in [ Uri.NE, Uri.MARKABLE, 'Tagger' ]
+    return is_token(type) or type in [ Uri.NE, Uri.MARKABLE, Uri.SEMANTIC_TAG, 'Tagger' ]
+
+def index_entity_types():
+    for t in entity_types:
+        type = t['type']
+        entity_types_index[type] = t
+
 
 def brat(lappsJson):
     docData = {}
