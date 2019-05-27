@@ -255,7 +255,7 @@ def is_token(type):
 
 def is_viewable(a):
     type = a['@type']
-    return is_token(type) or type in [ Uri.NE, Uri.MARKABLE, Uri.SEMANTIC_TAG, 'Tagger' ]
+    return is_token(type) or type in [ Uri.NE, Uri.MARKABLE, Uri.SEMANTIC_TAG, 'Tagger' ] or 'label' in a
 
 def index_entity_types():
     for t in entity_types:
