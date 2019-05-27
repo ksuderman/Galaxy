@@ -199,10 +199,10 @@ def getLabel(annotation):
     type = annotation['@type']
     if type == Uri.NE and annotation['features'] != None:
         return annotation['features']['category']
-    if is_token(type) and annotation['features'] != None:
+    if is_token(type) and 'features' in annotation and 'pos' in annotation['features']:
         return annotation['features']['pos']
     if type == Uri.MARKABLE:
-        if annotation['label'] != None:
+        if 'label' in annotation:
             return annotation['label']
         return 'Markable'
     if type == 'Tagger' and 'type' in annotation['features']:
