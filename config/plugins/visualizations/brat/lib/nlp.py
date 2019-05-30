@@ -253,9 +253,15 @@ def processGenericRelations(annotations):
 def is_token(type):
     return type in [Uri.TOKEN, Uri.POS, 'Token', 'Token#pos']
 
+def is_known(type):
+    return type in [ Uri.NE, Uri.MARKABLE, Uri.SEMANTIC_TAG, 'Tagger' ]
+
+def is_span(a):
+    return 'start' in a and 'label' in a
+
 def is_viewable(a):
     type = a['@type']
-    return is_token(type) or type in [ Uri.NE, Uri.MARKABLE, Uri.SEMANTIC_TAG, 'Tagger' ] or 'label' in a
+    return is_token(type) or is_known(type)  or is_span(a)
 
 def index_entity_types():
     for t in entity_types:
