@@ -209,7 +209,7 @@ def getLabel(annotation):
         return annotation['features']['type']
     if type == Uri.SEMANTIC_TAG and 'tags' in annotation['features']:
         return annotation['features']['tags'][0]['id']
-    if annotation['label'] != None:
+    if 'label' in annotation:
         return annotation['label']
     return 'Entity'
 
