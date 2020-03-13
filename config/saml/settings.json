@@ -1,0 +1,42 @@
+{
+    "strict": false,
+    "debug": true,
+    "sp": {
+        "entityId": "https://idp.lappsgrid.org/galaxy",
+        "assertionConsumerService": {
+            "url": "https://idp.lappsgrid.org/authnz/saml/acs",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        },
+        "singleLogoutService": {
+            "url": "https://idp.lappsgrid.org/authnz.saml/logout",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "NameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+        "x509cert": "",
+        "privateKey": ""
+    },
+    "idp": {
+        "entityId": "https://samltest.id/saml/idp",
+        "singleSignOnService": {
+            "url": "https://samltest.id/idp/profile/SAML2/Redirect/SSO",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "singleLogoutService": {
+            "url": "https://samltest.id/idp/profile/SAML2/Redirect/SLO",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "x509cert": "MIIDEjCCAfqgAwIBAgIVAMECQ1tjghafm5OxWDh9hwZfxthWMA0GCSqGSIb3DQEB\nCwUAMBYxFDASBgNVBAMMC3NhbWx0ZXN0LmlkMB4XDTE4MDgyNDIxMTQwOVoXDTM4\nMDgyNDIxMTQwOVowFjEUMBIGA1UEAwwLc2FtbHRlc3QuaWQwggEiMA0GCSqGSIb3\nDQEBAQUAA4IBDwAwggEKAoIBAQC0Z4QX1NFKs71ufbQwoQoW7qkNAJRIANGA4iM0\nThYghul3pC+FwrGv37aTxWXfA1UG9njKbbDreiDAZKngCgyjxj0uJ4lArgkr4AOE\njj5zXA81uGHARfUBctvQcsZpBIxDOvUUImAl+3NqLgMGF2fktxMG7kX3GEVNc1kl\nbN3dfYsaw5dUrw25DheL9np7G/+28GwHPvLb4aptOiONbCaVvh9UMHEA9F7c0zfF\n/cL5fOpdVa54wTI0u12CsFKt78h6lEGG5jUs/qX9clZncJM7EFkN3imPPy+0HC8n\nspXiH/MZW8o2cqWRkrw3MzBZW3Ojk5nQj40V6NUbjb7kfejzAgMBAAGjVzBVMB0G\nA1UdDgQWBBQT6Y9J3Tw/hOGc8PNV7JEE4k2ZNTA0BgNVHREELTArggtzYW1sdGVz\ndC5pZIYcaHR0cHM6Ly9zYW1sdGVzdC5pZC9zYW1sL2lkcDANBgkqhkiG9w0BAQsF\nAAOCAQEASk3guKfTkVhEaIVvxEPNR2w3vWt3fwmwJCccW98XXLWgNbu3YaMb2RSn\n7Th4p3h+mfyk2don6au7Uyzc1Jd39RNv80TG5iQoxfCgphy1FYmmdaSfO8wvDtHT\nTNiLArAxOYtzfYbzb5QrNNH/gQEN8RJaEf/g/1GTw9x/103dSMK0RXtl+fRs2nbl\nD1JJKSQ3AdhxK/weP3aUPtLxVVJ9wMOQOfcy02l+hHMb6uAjsPOpOVKqi3M8XmcU\nZOpx4swtgGdeoSpeRyrtMvRwdcciNBp9UZome44qZAYH1iqrpmmjsfI9pJItsgWu\n3kXPjhSfj1AJGR1l9JGvJrHki1iHTA=="
+    },
+    "idp.onelogin": {
+        "entityId": "https://app.onelogin.com/saml/metadata/cc59080f-ca88-444d-93e5-75c143934a8e",
+        "singleSignOnService": {
+            "url": "https://app.onelogin.com/trust/saml2/http-post/sso/cc59080f-ca88-444d-93e5-75c143934a8e",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "singleLogoutService": {
+            "url": "https://app.onelogin.com/trust/saml2/http-redirect/slo/cc59080f-ca88-444d-93e5-75c143934a8e",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "x509cert": "MIID4jCCAsqgAwIBAgIUHL8KBzGOelzB8C6Oq84/dIZAAU0wDQYJKoZIhvcNAQEFBQAwRzESMBAGA1UECgwJbGFwcHNncmlkMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxGjAYBgNVBAMMEU9uZUxvZ2luIEFjY291bnQgMB4XDTIwMDMwMzE4NTcyNVoXDTI1MDMwMzE4NTcyNVowRzESMBAGA1UECgwJbGFwcHNncmlkMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxGjAYBgNVBAMMEU9uZUxvZ2luIEFjY291bnQgMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsZIdoL+WqzwsOYR5uQfm4OLKgcoQ9cdZPW07xRrk9iPAYJ/WikEPQo6tqaElYQVQT+FL7bvywXjpp41xhXtDFwXmzWupzY0NEVCgE5IQEJLzt79ulAfArxIZCzq8LrO97CfzJKqAj3XF8z/NTdsM7yrIoWlG7LlGfkMyn8YHNc0xtcFwfBfOb/V0zr6i5aBFsSoxC/03EodUX1H+8umaS9shXiWDKyB1RpfUn1D6m+DThJKOBRCmO7cbrjeakhQfVoqJLy6dWaEq3prRJjPRnPUVp+tLEC5lJ8hnxH+3v5Ipr7DcoPYl2z+rvE6kAS6//ER61pnpdFpXa4nYXhsD8QIDAQABo4HFMIHCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFGQr0dlD9BxTgteOgBYQ9IzytUCkMIGCBgNVHSMEezB5gBRkK9HZQ/QcU4LXjoAWEPSM8rVApKFLpEkwRzESMBAGA1UECgwJbGFwcHNncmlkMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxGjAYBgNVBAMMEU9uZUxvZ2luIEFjY291bnQgghQcvwoHMY56XMHwLo6rzj90hkABTTAOBgNVHQ8BAf8EBAMCB4AwDQYJKoZIhvcNAQEFBQADggEBAJpL0l8yE7uhvmzd8br308gWZQoVqJd7wLShaAhOtK2KlCUoAKIWB24CtQEZtazwICfBtdRei9WfdHSej32efSzhV1y1AmwDyW2mYzEbT+K2uDcgf3rvng2XGz7YYvplscxr6aqLemmoiOe6zaChKk/vOlpZW+YH/pgFU3g8XHP8ieHbNH7GHhjcgPirOJYEPl+k/jTAPJ6H/9w2J93ZMgU/IS9avi9pc2Aql91yYKNBQzRBvdzhxCijsgXFrCPOmZ6UF/dImAdvfiRdSZLcFUGYBX5unIWuK8bUzuk2aGJDuXAmLm9bgKEBSVpL5Pv3kcOcBJq3xjJIJ6+MwoDN4TI="
+    }
+}
