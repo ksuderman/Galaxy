@@ -12,7 +12,7 @@ import logging
 from galaxy import web
 from galaxy.webapps.base.controller import JSAppLauncher
 
-from galaxy.web import url_for
+from galaxy.web import url_for, expose_api_anonymous
 
 log = logging.getLogger(__name__)
 
@@ -133,3 +133,16 @@ class SAML(JSAppLauncher):
     def logout(self, trans, *args, **kwargs):
         log.debug("Logout called")
         return { 'redirect_uri': url_for('/')}
+
+    @web.expose
+    def metadata(self, trans, *args, **kwargs):
+        log.debug("Getting metadata")
+        req, auth = self.init_saml_auth(trans)
+        settings = auth.get_settings()
+        metadata = settings.get_sp_metadata()
+        errors = settings.validate_metadata(metadata)
+        if len(errors) == 0:
+            trans.response.set_content_type('text/xml')
+            return metadata
+
+        return trans.show_error_message(', '.join(errors))

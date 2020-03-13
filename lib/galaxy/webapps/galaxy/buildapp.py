@@ -72,6 +72,7 @@ def app_factory(global_conf, load_app_kwds={}, **kwargs):
     webapp.add_route('/authnz/saml/login', controller='saml', action='login', provider=None)
     webapp.add_route('/authnz/saml/acs', controller='saml', action='assertion_consumer_service', provider=None)
     webapp.add_route('/authnz/saml/logout', controller='saml', action='logout', provider=None)
+    webapp.add_route('/authnz/saml/metadata', controller='saml', action='metadata', provider=None)
 
     # Authentication endpoints.
     webapp.add_route('/authnz/', controller='authnz', action='index', provider=None)
