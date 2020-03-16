@@ -96,10 +96,9 @@ class SAML(JSAppLauncher):
     def assertion_consumer_service(self, trans, *args, **kwargs):
         req, auth = self.init_saml_auth(trans)
 
-        session = kwargs #trans.galaxy_session
         request_id = None
-        if 'AuthNRequestID' in session:
-            request_id = session['AuthNRequestID']
+        if 'AuthNRequestID' in kwargs:
+            request_id = kwargs['AuthNRequestID']
 
         auth.process_response(request_id=request_id)
         errors = auth.get_errors()
