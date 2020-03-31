@@ -15,6 +15,7 @@ from galaxy.webapps.base.controller import JSAppLauncher
 from galaxy.web import url_for, expose_api_anonymous
 
 log = logging.getLogger(__name__)
+home = "https://jetstream.lappsgrid.org"
 
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -22,6 +23,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 class SAML(JSAppLauncher):
 
     def prepare_request(self, request):
+        log.debug("Request server port " + request.server_port)
         return {
             'https': 'on' if request.scheme == 'https' else 'off',
             'http_host': request.host,
@@ -33,7 +35,7 @@ class SAML(JSAppLauncher):
 
     def init_saml_auth(self, trans):
         req = self.prepare_request(trans.request)
-        return req, OneLogin_Saml2_Auth(req, custom_base_path=trans.app.config.saml_config_dir)
+        return OneLogin_Saml2_Auth(req, custom_base_path=trans.app.config.saml_config_dir)
 
     @web.json
     @web.expose
@@ -44,11 +46,11 @@ class SAML(JSAppLauncher):
             log.debug(msg)
             return trans.show_error_message(msg)
         log.debug("Loading config from " + trans.app.config.saml_config_dir)
-        req, auth = self.init_saml_auth(trans)
+        auth = self.init_saml_auth(trans)
         log.debug("Create auth object")
-        return_to = url_for("/") #trans.request.host_url
-        redirect = auth.login(return_to)
+        return_to = trans.request.host_url
         log.debug("return_to: " + return_to)
+        redirect = auth.login(return_to)
         log.debug("redirect to: " + redirect)
         # return trans.response.send_redirect(redirect)
         return {"redirect_uri": redirect}
@@ -130,7 +132,7 @@ class SAML(JSAppLauncher):
 
     @web.expose
     def logout(self, trans, *args, **kwargs):
-        log.debug("Logout called")
+        log.debug("Logout called. Redirect to " + url_for('/'))
         return { 'redirect_uri': url_for('/')}
 
     @web.expose
