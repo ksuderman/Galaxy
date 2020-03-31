@@ -95,7 +95,7 @@ class SAML(JSAppLauncher):
 
     @web.expose
     def assertion_consumer_service(self, trans, *args, **kwargs):
-        req, auth = self.init_saml_auth(trans)
+        auth = self.init_saml_auth(trans)
 
         request_id = None
         if 'AuthNRequestID' in kwargs:
