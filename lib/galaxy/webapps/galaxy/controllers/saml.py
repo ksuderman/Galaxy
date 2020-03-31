@@ -15,7 +15,6 @@ from galaxy.webapps.base.controller import JSAppLauncher
 from galaxy.web import url_for, expose_api_anonymous
 
 log = logging.getLogger(__name__)
-home = "https://jetstream.lappsgrid.org"
 
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -23,7 +22,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 class SAML(JSAppLauncher):
 
     def prepare_request(self, request):
-        log.debug("Request server port " + request.server_port)
+        log.debug("Request server port %d" % request.server_port)
         return {
             'https': 'on' if request.scheme == 'https' else 'off',
             'http_host': request.host,
