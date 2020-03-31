@@ -8,6 +8,7 @@ scripts/scramble/archives
 # Python virtualenv
 .venv
 .venv3
+.python-version
 
 # Python build artifacts
 build

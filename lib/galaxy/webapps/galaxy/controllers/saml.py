@@ -46,7 +46,7 @@ class SAML(JSAppLauncher):
         log.debug("Loading config from " + trans.app.config.saml_config_dir)
         req, auth = self.init_saml_auth(trans)
         log.debug("Create auth object")
-        return_to = trans.request.host_url
+        return_to = url_for("/") #trans.request.host_url
         redirect = auth.login(return_to)
         log.debug("return_to: " + return_to)
         log.debug("redirect to: " + redirect)
